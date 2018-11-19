@@ -1,0 +1,33 @@
+turtles-own
+[
+  ;;position variables;;
+  r
+  phi
+  theta
+  ;;;;--------------;;;;
+]
+
+
+to random-position
+  set r max-pxcor
+  set phi random 360;;
+  set theta random 180;;
+  setxyz  r * sin(phi) * cos(theta) r * sin(phi) * sin(theta) r * cos(phi)
+end
+
+to move
+  if breed = consumers[
+    if random-float 1 < p-cons-move [
+      set phi phi + angle-max - random-float (2 * angle-max)
+      set theta theta + angle-max - random-float (2 * angle-max)
+    ]
+  ]
+  if breed = providers[
+    if random-float 1 < p-prov-move [
+      set phi phi + angle-max - random-float (2 * angle-max)
+      set theta theta + angle-max - random-float (2 * angle-max)
+    ]
+  ]
+  setxyz  r * sin(phi) * cos(theta) r * sin(phi) * sin(theta) r * cos(phi)
+
+end

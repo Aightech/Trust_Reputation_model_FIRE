@@ -1,0 +1,16 @@
+breed [ consumers consumer ]
+
+consumers-own
+[
+  activity;;alpha
+  rating-history;;
+]
+
+to init-consumer
+  set color blue
+  set activity random-float 1.25 - 0.25
+  set rating-history array:from-list n-values history-size [0]
+  
+  random-position
+  
+end
