@@ -9,13 +9,20 @@ turtles-own
 
 
 to random-position
-  set r max-pxcor
+  set size 0.05
+  set r 1
   set phi random 360;;
   set theta random 180;;
   setxyz  r * sin(phi) * cos(theta) r * sin(phi) * sin(theta) r * cos(phi)
 end
 
 to move
+  ;;set size radius-of-operation
+  ;;set shape "circle 2"
+  ;;stamp
+  ;;set size radius-of-operation + 10
+  ;;stamp-erase
+  
   if breed = consumers[
     if random-float 1 < p-cons-move [
       set phi phi + angle-max - random-float (2 * angle-max)
@@ -29,5 +36,26 @@ to move
     ]
   ]
   setxyz  r * sin(phi) * cos(theta) r * sin(phi) * sin(theta) r * cos(phi)
+  print drawing-r0
+  if drawing-r0 = true
+  [
+    draw-operation-radius
+    pu
+    setxyz  r * sin(phi) * cos(theta) r * sin(phi) * sin(theta) r * cos(phi)
+  ]
 
+end
+
+to draw-operation-radius
+  let i 0
+  let a 20
+  pu 
+  setxyz r * (cos(theta) * cos(phi) * sin(a) * sin(i) + cos(theta) * sin(phi) * cos(a) - sin(theta) * sin(a) * cos(i)) r * (sin(theta) * cos(phi) * sin(a) * sin(i) + sin(theta) * sin(phi) * cos(a) + cos(theta) * sin(a) * cos(i)) r * (cos(phi) * cos(a) - sin(phi) * sin(a) * sin(i))
+  pd
+  loop [
+    if i > 360 [ stop ]
+    setxyz r * (cos(theta) * cos(phi) * sin(a) * sin(i) + cos(theta) * sin(phi) * cos(a) - sin(theta) * sin(a) * cos(i)) r * (sin(theta) * cos(phi) * sin(a) * sin(i) + sin(theta) * sin(phi) * cos(a) + cos(theta) * sin(a) * cos(i)) r * (cos(phi) * cos(a) - sin(phi) * sin(a) * sin(i))
+    set i i + 1
+  ]
+  pu
 end
