@@ -1,42 +1,63 @@
 extensions [array]
-__includes["turtles.nls" "consumers.nls" "providers.nls"]
+__includes["turtles.nls" "consumers.nls" "providers.nls" "constant.nls"]
 
+globals [number-providers]
 
 
 to setup
   clear-all
+  zoom 62
+  set number-providers number-good-providers + number-ordinary-providers + number-intermittent-providers + number-bad-providers
+  set_constant
   create-consumers number-consumers [
     init-consumer
   ]
-  create-providers number-providers [
-    init-provider
+  create-providers number-good-providers [
+    init-provider GOOD
   ]
-
-
-  zoom 62
-  ;;update-plots
+  create-providers number-ordinary-providers [
+    init-provider ORDINARY
+  ]
+  create-providers number-bad-providers [
+    init-provider BAD
+  ]
+  create-providers number-intermittent-providers [
+    init-provider INTERMITTENT
+  ]
+  update-plots
+  reset-ticks
 end
 
 to start
-  clear-drawing
+  if ticks >= number-simulation
+      [stop]
+  ask consumers
+  [
+    ask-service-consumer
+  ]
   ask turtles
   [
     move;
   ]
   pop-update
-  ;;clear-drawing
+  ask providers
+  [
+    behaviour-update-provider
+  ]
   display
+  tick
 end
 
 to pop-update
   ;;kill a part of the population
   ask n-of (ratio-cons-update * number-consumers) consumers[die]
   ask n-of (ratio-prov-update * number-providers) providers[die]
-  ;;recreate this part of the population
+  ;;recreate this part of the population TODO take into account the profile
   create-consumers ratio-cons-update * number-consumers [ init-consumer ]
-  create-providers ratio-prov-update * number-providers [ init-provider ]
+  create-providers ratio-prov-update * number-providers [ init-provider GOOD ]
 
 end
+
 @#$#@#$#@
 GRAPHICS-WINDOW
 0
@@ -68,10 +89,10 @@ ticks
 30.0
 
 BUTTON
-38
-75
-206
-108
+10
+94
+184
+127
 NIL
 setup
 NIL
@@ -84,31 +105,16 @@ NIL
 NIL
 1
 
-SLIDER
-37
-36
-207
-69
-number-providers
-number-providers
-0
-500
-1.0
-1
-1
-NIL
-HORIZONTAL
-
 PLOT
-33
-150
-233
-300
+49
+455
+249
+605
 xcor
 NIL
 NIL
--16.0
-16.0
+-1.0
+1.0
 0.0
 13.0
 true
@@ -118,15 +124,15 @@ PENS
 "xcor" 1.0 1 -16777216 true "" "histogram [xcor] of turtles"
 
 PLOT
-33
-299
-233
-449
+257
+455
+457
+605
 ycor
 NIL
 NIL
--16.0
-16.0
+-1.0
+1.0
 0.0
 10.0
 true
@@ -136,15 +142,15 @@ PENS
 "ycor" 1.0 1 -16777216 true "" "histogram [ycor] of turtles"
 
 PLOT
-33
-448
-233
-598
+467
+455
+667
+605
 zcor
 NIL
 NIL
--16.0
-16.0
+-1.0
+1.0
 0.0
 10.0
 true
@@ -154,25 +160,25 @@ PENS
 "zcor" 1.0 1 -16777216 true "" "histogram [zcor] of turtles"
 
 SLIDER
-212
-36
-381
-69
+9
+51
+268
+84
 number-consumers
 number-consumers
 0
 500
-1.0
+172.0
 1
 1
 NIL
 HORIZONTAL
 
 BUTTON
-211
-75
-381
-108
+483
+95
+656
+128
 NIL
 start
 T
@@ -183,109 +189,270 @@ NIL
 NIL
 NIL
 NIL
-1
+0
 
 SLIDER
-249
-154
-384
-187
+10
+179
+145
+212
 p-cons-move
 p-cons-move
 0
 1
-0.0
+0.5
 0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-250
-190
-385
-223
+11
+215
+146
+248
 p-prov-move
 p-prov-move
 0
 1
-0.0
+0.5
 0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-250
-226
-386
-259
+11
+251
+147
+284
 angle-max
 angle-max
 0
 360
-3.5
+1.5
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-403
-153
-575
-186
+164
+178
+336
+211
 history-size
 history-size
 0
 10
-0.0
+5.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-248
-298
-430
+9
+323
+191
+356
+ratio-prov-update
+ratio-prov-update
+0
+1
+0.13
+0.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+8
+360
+191
+393
+ratio-cons-update
+ratio-cons-update
+0
+1
+0.19
+0.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
+190
+96
+476
+129
+number-simulation
+number-simulation
+0
+1000
+7.0
+1
+1
+rounds
+HORIZONTAL
+
+SLIDER
+6
+10
+157
+43
+number-good-providers
+number-good-providers
+0
+100
+56.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+163
+10
+325
+43
+number-ordinary-providers
+number-ordinary-providers
+0
+100
+32.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
 331
-ratio-prov-update
-ratio-prov-update
+10
+505
+43
+number-intermittent-providers
+number-intermittent-providers
 0
+100
+5.0
 1
-0.03
-0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-247
-335
-430
-368
-ratio-cons-update
-ratio-cons-update
+510
+10
+654
+43
+number-bad-providers
+number-bad-providers
+0
+100
+45.0
+1
+1
+NIL
+HORIZONTAL
+
+MONITOR
+666
+10
+803
+55
+total number of providers
+number-good-providers + number-ordinary-providers + number-intermittent-providers + number-bad-providers
+17
+1
+11
+
+SLIDER
+284
+51
+461
+84
+min-activity-consumers
+min-activity-consumers
 0
 1
-0.06
-0.01
+0.25
+0.05
 1
 NIL
 HORIZONTAL
 
 SLIDER
-248
-403
+473
+51
+654
+84
+max-activity-consumers
+max-activity-consumers
+min-activity-consumers
+1
+1.0
+0.05
+1
+NIL
+HORIZONTAL
+
+SLIDER
+279
+321
+451
+354
+radius-of-operation
+radius-of-operation
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+435
+166
+607
+199
+M
+M
+0
+100
+50.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
 438
-436
-radius-of-operation
-radius-of-operation
+212
+610
+245
+p-muC
+p-muC
+0
+1001
+0.3
+0.1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+439
+258
+611
+291
+p-profile-switch
+p-profile-switch
 0
 1
-0.09
-0.01
+0.1
+0.1
 1
 NIL
 HORIZONTAL
