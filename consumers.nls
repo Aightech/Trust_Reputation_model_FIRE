@@ -4,13 +4,29 @@ consumers-own
 [
   activity;;alpha
   rating-history;;
+  trust-model?
 ]
 
 to init-consumer
   set color blue
   set activity random-float (max-activity-consumers - min-activity-consumers) + min-activity-consumers 
   set rating-history array:from-list n-values history-size [0]
-  
+  set trust-model? false
   random-position
   
+end
+
+to ask-service-consumer
+  if random-float 1.0 < activity
+  [
+    let nearest-providers min-n-of 10 providers [distance myself];; TODO 10 ?
+    ifelse not trust-model?
+    [
+      ask one-of nearest-providers 
+      [let utility performance-provider 0];; TODO distance
+    ]
+    [
+      ;;TODO
+    ]
+  ]
 end
