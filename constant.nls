@@ -1,0 +1,17 @@
+globals [PL_PERFECT PL_GOOD PL_OK PL_WORST PL_BAD GOOD ORDINARY BAD INTERMITTENT sig_good sig_ordinary sig_bad degradation]
+
+to set_constant
+  set PL_PERFECT 10
+  set PL_GOOD 5
+  set PL_OK 0
+  set PL_BAD -5
+  set PL_WORST -10
+  set GOOD 0
+  set ORDINARY 1
+  set BAD 2
+  set INTERMITTENT 3
+  set sig_good 1.0 ;; standart deviation for good profiles
+  set sig_ordinary 2.0 ;; standart deviation for ordinary profiles
+  set sig_bad 2.0 ;; standart deviation for bad profiles
+  set degradation 0.5 ;; linear coefficient for degradation of the perf of providers regarding the distance
+end

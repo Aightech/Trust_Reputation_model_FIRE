@@ -2,13 +2,51 @@ breed [ providers provider ]
 providers-own
 [
   profile;
-  mu-perf;;perfomance moyenne
+  mu-perf;;perfomance moyenne 
   sig-perf;;ecart type
   ;;rating-history;;
 ]
 
-to init-provider
+to init-provider [prof]
   set color red
   random-position
+  set profile prof
+  param-profile-provider  
   ;;set rating-history array:from-list n-values history-size [0]
+end
+
+to param-profile-provider
+  if profile = GOOD
+  [
+    set mu-perf (PL_GOOD + random (PL_PERFECT - PL_GOOD))
+    set sig-perf sig_good
+  ]
+  if profile = ORDINARY
+  [
+    set mu-perf (PL_OK + random (PL_GOOD - PL_OK))
+    set sig-perf sig_ordinary
+  ]
+  if profile = BAD
+  [
+    set mu-perf (PL_WORST + random (PL_OK - PL_WORST))
+    set sig-perf sig_bad
+  ]
+end
+
+to-report performance-provider [dist] ;;determine the performance of a provider
+  let utility 0
+  ifelse profile = INTERMITTENT ;; define performance regarding the profile
+  [set utility (PL_BAD + random (PL_GOOD - PL_BAD))]
+  [set utility random-normal mu-perf sig-perf]
+  ifelse  dist < radius-of-operation ;; take into acount degradation if the consumer is outside of provider area
+  [report (utility + dist * degradation)]
+  [report utility] 
+end
+
+to behaviour-update-provider
+  if random-float 1.0 < p-muC
+  [set mu-perf (mu-perf - M + random (2 * M))]
+  if random-float 1.0 < p-profile-switch
+  [set profile ((profile + 1 + random 3) mod 4)]
+  param-profile-provider
 end
