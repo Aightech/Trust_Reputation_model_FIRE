@@ -93,7 +93,7 @@ number-providers
 number-providers
 0
 500
-1.0
+3.0
 1
 1
 NIL
@@ -162,7 +162,7 @@ number-consumers
 number-consumers
 0
 500
-1.0
+3.0
 1
 1
 NIL
@@ -284,11 +284,22 @@ radius-of-operation
 radius-of-operation
 0
 1
-0.09
+0.07
 0.01
 1
 NIL
 HORIZONTAL
+
+SWITCH
+479
+103
+612
+136
+drawing-r0
+drawing-r0
+0
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?

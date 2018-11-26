@@ -48,7 +48,7 @@ end
 
 to draw-operation-radius
   let i 0
-  let a 20
+  let a asin(radius-of-operation)
   pu 
   setxyz r * (cos(theta) * cos(phi) * sin(a) * sin(i) + cos(theta) * sin(phi) * cos(a) - sin(theta) * sin(a) * cos(i)) r * (sin(theta) * cos(phi) * sin(a) * sin(i) + sin(theta) * sin(phi) * cos(a) + cos(theta) * sin(a) * cos(i)) r * (cos(phi) * cos(a) - sin(phi) * sin(a) * sin(i))
   pd
