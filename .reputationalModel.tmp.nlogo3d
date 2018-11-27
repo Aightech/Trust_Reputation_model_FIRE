@@ -29,6 +29,77 @@ to setup
 end
 
 to start
+  print "==================="
+  let i 0
+
+  ;;init of each customer
+  let size-history 3
+  let history-rating []
+  let history-index 0
+  set history-rating n-values size-history [[23 2 0]]
+  print "history-rating"
+  print history-rating
+
+  ;;#########################"
+  ;;at the end of a deal
+  let id 23
+  let t 10
+  let v 5
+  set history-rating replace-item history-index history-rating [0 0 0];; init the rating slot.
+  set history-rating (replace-item history-index history-rating
+                  (replace-item 0 (item history-index history-rating) id));;set the id of the selected provider
+  set history-rating (replace-item history-index history-rating
+                  (replace-item 1 (item history-index history-rating) v));;set the UG of the deal
+  set history-rating (replace-item history-index history-rating
+                  (replace-item 2 (item history-index history-rating) t));;set the time of the deal
+
+  ifelse history-index <= 1 [ set history-index history-index + 1 ] [ set history-index 0 ] ;;inc the index of the history of rating
+  ;;#########################"
+
+  ;;#########################"
+  ;;if ask list of transaction with agent b  >> to-report average [a b]report (a + b) / 2
+  let b 23
+  let list-of-rating []
+  set i 0
+  foreach history-rating
+  [
+    n -> set n n
+    if empty? n != true and (item 0 n) = b
+    [
+        set list-of-rating lput n list-of-rating
+    ]
+    set i i + 1
+  ]
+  print "list-rating"
+  print list-of-rating
+  ;;report list-of-rating
+  ;;#########################"
+
+  ;;#########################"
+  ;;compute TK avec la list L not empty and return TK
+  let L list-of-rating
+  let Tk 0
+  let denominator 0
+  foreach L
+  [
+    n -> set n n
+    set Tk Tk + exp((item 2 n) / 0.1) * (item 1 n)
+    set denominator denominator + exp((item 2 n) / 0.1)
+    set i i + 1
+  ]
+  print "l"
+  print Tk
+  ;;retort TK
+  ;;#########################"
+
+
+  stop
+
+    ;;set mylist (replace-item 3 mylist
+                 ;; (replace-item 2 (item 3 mylist) 9))
+
+end
+to comment
   if ticks >= number-simulation
       [stop]
   ask consumers
@@ -45,7 +116,7 @@ to start
     behaviour-update-provider
   ]
   display
-
+  clear-drawing
   tick
 end
 
@@ -189,7 +260,7 @@ NIL
 NIL
 NIL
 NIL
-0
+1
 
 SLIDER
 10
@@ -200,7 +271,7 @@ p-cons-move
 p-cons-move
 0
 1
-0.0
+0.78
 0.01
 1
 NIL
@@ -215,7 +286,7 @@ p-prov-move
 p-prov-move
 0
 1
-0.0
+0.82
 0.01
 1
 NIL
@@ -230,7 +301,7 @@ angle-max
 angle-max
 0
 360
-0.0
+26.8
 0.1
 1
 NIL
@@ -260,7 +331,7 @@ ratio-prov-update
 ratio-prov-update
 0
 1
-0.0
+0.01
 0.01
 1
 NIL
@@ -335,7 +406,7 @@ number-intermittent-providers
 number-intermittent-providers
 0
 100
-0.0
+1.0
 1
 1
 NIL
@@ -376,7 +447,7 @@ min-activity-consumers
 min-activity-consumers
 0
 1
-0.0
+0.25
 0.05
 1
 NIL
@@ -406,7 +477,7 @@ radius-of-operation
 radius-of-operation
 0
 1
-0.6
+0.2
 0.1
 1
 NIL
