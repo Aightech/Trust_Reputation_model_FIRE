@@ -30,81 +30,13 @@ end
 
 to start
   print "==================="
-  let i 0
-
-  ;;init of each customer
-  let size-history 3
-  let history-rating []
-  let history-index 0
-  set history-rating n-values size-history [[23 2 0]]
-  print "history-rating"
-  print history-rating
-
-  ;;#########################"
-  ;;at the end of a deal
-  let id 23
-  let t 10
-  let v 5
-  set history-rating replace-item history-index history-rating [0 0 0];; init the rating slot.
-  set history-rating (replace-item history-index history-rating
-                  (replace-item 0 (item history-index history-rating) id));;set the id of the selected provider
-  set history-rating (replace-item history-index history-rating
-                  (replace-item 1 (item history-index history-rating) v));;set the UG of the deal
-  set history-rating (replace-item history-index history-rating
-                  (replace-item 2 (item history-index history-rating) t));;set the time of the deal
-
-  ifelse history-index <= 1 [ set history-index history-index + 1 ] [ set history-index 0 ] ;;inc the index of the history of rating
-  ;;#########################"
-
-  ;;#########################"
-  ;;if ask list of transaction with agent b  >> to-report average [a b]report (a + b) / 2
-  let b 23
-  let list-of-rating []
-  set i 0
-  foreach history-rating
-  [
-    n -> set n n
-    if empty? n != true and (item 0 n) = b
-    [
-        set list-of-rating lput n list-of-rating
-    ]
-    set i i + 1
-  ]
-  print "list-rating"
-  print list-of-rating
-  ;;report list-of-rating
-  ;;#########################"
-
-  ;;#########################"
-  ;;compute TK avec la list L not empty and return TK
-  let L list-of-rating
-  let Tk 0
-  let denominator 0
-  foreach L
-  [
-    n -> set n n
-    set Tk Tk + exp((item 2 n) / 0.1) * (item 1 n)
-    set denominator denominator + exp((item 2 n) / 0.1)
-    set i i + 1
-  ]
-  print "l"
-  print Tk
-  ;;retort TK
-  ;;#########################"
 
 
-  stop
-
-    ;;set mylist (replace-item 3 mylist
-                 ;; (replace-item 2 (item 3 mylist) 9))
-
-end
-to comment
   if ticks >= number-simulation
       [stop]
   ask consumers
   [
-    ;;ask-service-consumer
+    ;;process-consumer
   ]
   ask turtles
   [
@@ -116,9 +48,15 @@ to comment
     behaviour-update-provider
   ]
   display
-  clear-drawing
+  ;;clear-drawing
   tick
 end
+
+
+
+
+
+
 
 to pop-update
   ;;kill a part of the population
@@ -239,7 +177,7 @@ number-consumers
 number-consumers
 0
 500
-0.0
+20.0
 1
 1
 NIL
@@ -271,7 +209,7 @@ p-cons-move
 p-cons-move
 0
 1
-0.78
+0.0
 0.01
 1
 NIL
@@ -286,7 +224,7 @@ p-prov-move
 p-prov-move
 0
 1
-0.82
+0.0
 0.01
 1
 NIL
@@ -308,10 +246,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-164
-178
-336
-211
+188
+167
+360
+200
 history-size
 history-size
 0
@@ -361,7 +299,7 @@ number-simulation
 number-simulation
 0
 1000
-1000.0
+982.0
 1
 1
 rounds
@@ -376,7 +314,7 @@ number-good-providers
 number-good-providers
 0
 100
-2.0
+1.0
 1
 1
 NIL
@@ -538,6 +476,54 @@ drawing-r0
 0
 1
 -1000
+
+SWITCH
+153
+208
+376
+241
+trust-interaction-model
+trust-interaction-model
+1
+1
+-1000
+
+SWITCH
+153
+243
+351
+276
+trust-witness-model
+trust-witness-model
+1
+1
+-1000
+
+SWITCH
+153
+278
+356
+311
+trust-certified-model
+trust-certified-model
+1
+1
+-1000
+
+SLIDER
+525
+399
+697
+432
+Temp
+Temp
+0
+70
+50.0
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?

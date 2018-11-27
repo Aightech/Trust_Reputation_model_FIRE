@@ -5,6 +5,7 @@ consumers-own
   activity;;alpha
   rating-history;;
   trust-model?
+  history-index
 ]
 
 to init-consumer
@@ -13,54 +14,173 @@ to init-consumer
   set rating-history array:from-list n-values history-size [0]
   set trust-model? false
   random-position
+  ;;init of each customer
+  let size-history 3
+  let history-rating []
+  set history-index 0
+  set history-rating n-values size-history [[23 2 0]]
+  print "history-rating"
+  print history-rating
   
 end
 
-to ask-service-consumer
-  if random-float 1.0 < activity
+to process-consumer
+  if random-float 1.0 < activity ;; and des provider around
   [
     ;;getProviders:list of 
-    let nearest-providers min-n-of 10 providers [distance myself];; TODO 10 ?
-    ifelse not trust-model?
+    ;let nearest-providers min-n-of 10 providers [distance myself];; TODO 10 ?
+    let nearest-providers min-n-of 2 providers [2 * asin((distance myself) / 2) * pi / 180];; TODO 10 ?
+    let nearest-providers-id [who] of nearest-providers
+    let p 0
+    ifelse trust-interaction-model or trust-witness-model or trust-certified-model 
+    [ set p choose(nearest-providers-id) ]
+    [ set p one-of nearest-providers-id ]
+    let utility 0
+    ask p [ set utility performance-provider 0 ]
+    
+  ]
+end
+
+to-report choose [ nearest-providers-id ]
+  
+  let T-max -1
+  let Id-max -1
+  let Ti 0
+  let Tw 0
+  let Tc 0
+  let Tfound 0
+  let T-to-find 0
+  let nb-T 0
+  let T-moy 0
+  let has-no-trust-value-list []
+  
+  foreach nearest-providers-id
+  [ p ->
+    if trust-interaction-model 
     [
-      ask one-of nearest-providers 
-      [let utility performance-provider 0];; TODO distance
+      set T-to-find T-to-find + 1
+      set Ti trust-interaction(p)
+      ifelse Ti = -2 [ set Ti 0 ][ set Tfound Tfound + 1]
+    ]
+    if trust-witness-model 
+    [
+      set T-to-find T-to-find + 1
+      set Tw trust-witness(p)
+      ifelse Tw = -2 [ set Tw 0 ][ set Tfound Tfound + 1]
+    ]
+    if trust-certified-model 
+    [
+      set T-to-find T-to-find + 1
+      set Tc trust-certified(p)
+      ifelse Tc = -2 [ set Tc 0 ][ set Tfound Tfound + 1]
+    ]
+    
+    ifelse Tfound = T-to-find 
+    [ 
+      let T Ti + Tw + Tc ;; TODO: add weights
+      set T-moy T-moy + T
+      set nb-T nb-T + 1
+      if T > T-max 
+      [
+        set T-max T
+        set id-max p
+      ]
     ]
     [
-      ;;TODO
-      
-      ;;Tk=sum(wk(ri).vi)/sum(wk(ri)
-      ;;w=exp(-dt/lambda)
-      ;;=sum(exp(-t(ri)/lambda).v(ri)) / sum(exp(-t(ri)/lambda))
-      
-      ;;extract[L,b]: return a list of all the transaction done with b 
-      
-      ;;[p1 p2 p3 p4]
-      
-      ;;getInteraction :
-      ;;[r1(p1,0.1,t1), r2(p1,0.2,t2), r3(p2,0.2,t3), r4(p3,0.3,t4)] 
-      ;;[Ti_p1 Ti_p2 Ti_p3 Ti_p4=-1000]
-      
-      ;;getReview :
-      ;;[r1(p2,0.1,t1), r2(p1,0.2,t2), r3(p2,0.2,t3), r4(p4,0.3,t4)] 
-      ;;[Ti_p1 Ti_p2 Ti_p3 Ti_p4=-1000]
-      
-       
-      ;;getReview
-      ;;getReputation
-      
-      ;;Tinteraction
-      ;extract[L,b]: return a list of all the transaction done with b 
-      ;;=sum(exp(-t(ri)/lambda).v(ri)) / sum(exp(-t(ri)/lambda))
-      
-      
-      ;;X_Trole_based_X
-      ;;Twitness
-      ;;Tcertified
-      
-      
-      
-      ;;T=sum(Tk.wk)/sum(wk)
+      set has-no-trust-value-list lput p has-no-trust-value-list
     ]
   ]
+  set T-moy T-moy / nb-T
+  let proba exp(T-max / Temp) / (exp(T-max / Temp) + exp(T-moy / Temp))
+  let choice random-float 1
+  ifelse proba < choice 
+  [ report id-max ]
+  [ report one-of has-no-trust-value-list ]
+    
+  report 0
+end
+
+
+to-report trust-interaction [ p ]
+  print "test"
+  let list-of-review review-of(p)
+  report compute-Tk(list-of-review)
+end
+
+to-report trust-witness [ p ]
+  print "test"
+  let list-of-review review-of(p)
+  report compute-Tk(list-of-review)
+end
+
+
+to-report trust-certified [ p ]
+  print "test"
+  let list-of-review review-of(p)
+  report compute-Tk(list-of-review)
+end
+
+
+
+to-report store-rating 
+  ;;#########################"
+  ;;at the end of a deal
+  let id 23
+  let t 10
+  let v 5
+  set rating-history replace-item history-index rating-history [0 0 0];; init the rating slot.
+  set rating-history (replace-item history-index rating-history
+                  (replace-item 0 (item history-index rating-history) id));;set the id of the selected provider
+  set rating-history (replace-item history-index rating-history
+                  (replace-item 1 (item history-index rating-history) v));;set the UG of the deal
+  set rating-history (replace-item history-index rating-history
+                  (replace-item 2 (item history-index rating-history) t));;set the time of the deal
+
+  ifelse history-index <= 1 [ set history-index history-index + 1 ] [ set history-index 0 ] ;;inc the index of the history of rating
+  ;;#########################"
+end
+
+to-report compute-Tk [ list-of-rating ]
+  ;;#########################
+  ;;compute TK avec la list L not empty and return TK
+  let Tk 0
+  let denominator 0
+  ifelse empty? list-of-rating
+  [ report -2 ]
+  [
+    let i 0
+    foreach list-of-rating
+    [
+      n -> 
+      set Tk Tk + exp((item 2 n) / 0.1) * (item 1 n)
+      set denominator denominator + exp((item 2 n) / 0.1)
+      set i i + 1
+    ]
+  ]
+  print "Tk"
+  print Tk
+  print "D"
+  print denominator
+  report TK
+  ;;#########################
+end
+
+to-report review-of [ b ]
+  ;;#########################
+  ;;if ask list of transaction with agent b  >> to-report average [a b]report (a + b) / 2
+  let list-of-rating []
+  let i 0
+  foreach rating-history
+  [
+    n -> 
+    if empty? n != true and (item 0 n) = b
+    [
+        set list-of-rating lput n list-of-rating
+    ]
+    set i i + 1
+  ]
+  print "list-rating"
+  print list-of-rating
+  report list-of-rating
+  ;;#########################
 end
