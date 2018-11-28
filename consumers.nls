@@ -3,22 +3,19 @@ breed [ consumers consumer ]
 consumers-own
 [
   activity;;alpha
-  rating-history;;
-  trust-model?
-  history-index
+
 ]
 
 to init-consumer
   set color blue
   set activity random-float (max-activity-consumers - min-activity-consumers) + min-activity-consumers 
   set rating-history array:from-list n-values history-size [0]
-  set trust-model? false
+  ;set trust-model? false
   random-position
   ;;init of each customer
-  let size-history 3
   let history-rating []
   set history-index 0
-  set history-rating n-values size-history [[23 2 0]]
+  ;set history-rating n-values size-history [[23 2 0]]
   print "history-rating"
   print history-rating
   
@@ -32,11 +29,12 @@ to process-consumer
     let nearest-providers min-n-of 2 providers [2 * asin((distance myself) / 2) * pi / 180];; TODO 10 ?
     let nearest-providers-id [who] of nearest-providers
     let p 0
+    print nearest-providers-id
     ifelse trust-interaction-model or trust-witness-model or trust-certified-model 
     [ set p choose(nearest-providers-id) ]
     [ set p one-of nearest-providers-id ]
     let utility 0
-    ask p [ set utility performance-provider 0 ]
+    ;ask p [ set utility performance-provider 0 ]
     
   ]
 end
@@ -90,10 +88,14 @@ to-report choose [ nearest-providers-id ]
       set has-no-trust-value-list lput p has-no-trust-value-list
     ]
   ]
-  set T-moy T-moy / nb-T
-  let proba exp(T-max / Temp) / (exp(T-max / Temp) + exp(T-moy / Temp))
+  let proba 0
+  if nb-T > 0
+  [
+    set T-moy T-moy / nb-T
+    set proba exp(T-max / Temp) / (exp(T-max / Temp) + exp(T-moy / Temp))
+  ]
   let choice random-float 1
-  ifelse proba < choice 
+  ifelse proba > choice 
   [ report id-max ]
   [ report one-of has-no-trust-value-list ]
     
@@ -108,8 +110,9 @@ to-report trust-interaction [ p ]
 end
 
 to-report trust-witness [ p ]
-  print "test"
-  let list-of-review review-of(p)
+  print "trust wit of agent"
+  print who
+  let list-of-review tree-consumers-review p 5 []
   report compute-Tk(list-of-review)
 end
 
@@ -120,7 +123,26 @@ to-report trust-certified [ p ]
   report compute-Tk(list-of-review)
 end
 
-
+to-report tree-consumers-review [ p i close-list]
+  ;let close-providers (providers with [2 * asin((distance myself) / 2) * pi / 180 < radius-of-operation])
+  ;let lp [who] of close-providers
+  let list-of-review review-of(p)
+  ifelse empty? list-of-review 
+  [ 
+    let close-consumers (consumers with [2 * asin((distance myself) / 2) * pi / 180 < radius-of-operation and (position who close-list) = false ])
+    ;let lc [who] of close-consumers
+    ask close-consumers 
+    [
+      set list-of-review sentence list-of-review tree-consumers-review p (i - 1) []
+    ]
+    report  []
+  ]
+  [ report list-of-review ]
+  ;let close-provider [who] of n-of 2 (providers with [2 * asin((distance myself) / 2) * pi / 180 < radius-of-operation])
+  ;print close-provider
+  
+   ;close-provider
+end
 
 to-report store-rating 
   ;;#########################"

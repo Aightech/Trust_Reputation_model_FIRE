@@ -13,6 +13,12 @@ to init-provider [prof]
   set profile prof
   param-profile-provider  
   ;;set rating-history array:from-list n-values history-size [0]
+  set rating-history array:from-list n-values history-size [0]
+  ;set trust-model? false
+  random-position
+  ;;init of each customer
+  let history-rating []
+  set history-index 0
 end
 
 to param-profile-provider

@@ -5,6 +5,8 @@ turtles-own
   phi
   theta
   ;;;;--------------;;;;
+    rating-history;;
+  history-index
 ]
 
 
@@ -36,8 +38,8 @@ to move
     ]
   ]
   setxyz  r * sin(phi) * cos(theta) r * sin(phi) * sin(theta) r * cos(phi)
-  print drawing-r0
-  if drawing-r0 = true
+  ;;print drawing-r0
+  if drawing-r0 = true and who = 0
   [
     draw-operation-radius
     pu
