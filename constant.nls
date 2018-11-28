@@ -14,7 +14,7 @@ to set_constant
   set sig_good 1.0 ;; standart deviation for good profiles
   set sig_ordinary 2.0 ;; standart deviation for ordinary profiles
   set sig_bad 2.0 ;; standart deviation for bad profiles
-  set degradation 0.5 ;; linear coefficient for degradation of the perf of providers regarding the distance
+  set degradation 0.1 ;; linear coefficient for degradation of the perf of providers regarding the distance
   set lambda -5 / ln(0.5)
   set nBF 2
   set nRL 5

@@ -10,7 +10,6 @@ turtles-own
   acquaintances
 ]
 
-
 to random-position
   set size 0.05
   set r 1
@@ -46,7 +45,6 @@ to move
     pu
     setxyz  r * sin(phi) * cos(theta) r * sin(phi) * sin(theta) r * cos(phi)
   ]
-
 end
 
 to draw-operation-radius
@@ -70,20 +68,3 @@ to set-acquaintances
   
 end
 
-to store-rating [ id v t ]
-  ;;#########################"
-  ;;at the end of a deal
-  ;let id 23
-  ;let t 10
-  ;let v 5
-  set rating-history replace-item history-index rating-history [0 0 0];; init the rating slot.
-  set rating-history (replace-item history-index rating-history
-                  (replace-item 0 (item history-index rating-history) id));;set the id of the selected provider
-  set rating-history (replace-item history-index rating-history
-                  (replace-item 1 (item history-index rating-history) v));;set the UG of the deal
-  set rating-history (replace-item history-index rating-history
-                  (replace-item 2 (item history-index rating-history) t));;set the time of the deal
-
-  ifelse history-index <= 1 [ set history-index history-index + 1 ] [ set history-index 0 ] ;;inc the index of the history of rating
-  ;;#########################"
-end

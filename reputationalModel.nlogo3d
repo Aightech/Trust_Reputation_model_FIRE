@@ -1,12 +1,13 @@
 extensions [array]
 __includes["turtles.nls" "consumers.nls" "providers.nls" "constant.nls"]
 
-globals [number-providers]
+globals [number-providers Temp]
 
 
 to setup
   clear-all
   zoom 62
+  set Temp initial-Temp
   set number-providers number-good-providers + number-ordinary-providers + number-intermittent-providers + number-bad-providers
   set_constant
   create-consumers number-consumers [
@@ -50,6 +51,9 @@ to start
   [
     behaviour-update-provider
   ]
+  set Temp Temp * ( 1 - ticks / number-simulation)
+  print "Temp"
+  print Temp
   display
   ;;clear-drawing
   tick
@@ -178,7 +182,7 @@ number-consumers
 number-consumers
 0
 500
-18.0
+51.0
 1
 1
 NIL
@@ -300,7 +304,7 @@ number-simulation
 number-simulation
 0
 1000
-100.0
+11.0
 1
 1
 rounds
@@ -315,7 +319,7 @@ number-good-providers
 number-good-providers
 0
 100
-9.0
+24.0
 1
 1
 NIL
@@ -330,7 +334,7 @@ number-ordinary-providers
 number-ordinary-providers
 0
 100
-7.0
+0.0
 1
 1
 NIL
@@ -345,7 +349,7 @@ number-intermittent-providers
 number-intermittent-providers
 0
 100
-12.0
+0.0
 1
 1
 NIL
@@ -360,7 +364,7 @@ number-bad-providers
 number-bad-providers
 0
 100
-12.0
+0.0
 1
 1
 NIL
@@ -416,7 +420,7 @@ radius-of-operation
 radius-of-operation
 0
 1
-1.0
+0.1
 0.1
 1
 NIL
@@ -496,7 +500,7 @@ SWITCH
 276
 trust-witness-model
 trust-witness-model
-0
+1
 1
 -1000
 
@@ -516,8 +520,8 @@ SLIDER
 399
 697
 432
-Temp
-Temp
+initial-temp
+initial-temp
 0
 70
 36.0

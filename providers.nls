@@ -11,6 +11,7 @@ to init-provider [prof]
   random-position
   set profile prof
   param-profile-provider  
+  set history-index 0
   ;;set rating-history array:from-list n-values history-size [0]
   ;;set rating-history array:from-list n-values history-size [0]
   ;set trust-model? false
@@ -41,8 +42,8 @@ to-report performance-provider [dist] ;;determine the performance of a provider
   ifelse profile = INTERMITTENT ;; define performance regarding the profile
   [set utility (PL_BAD + random (PL_GOOD - PL_BAD))]
   [set utility random-normal mu-perf sig-perf]
-  ifelse  dist < radius-of-operation ;; take into acount degradation if the consumer is outside of provider area
-  [report (utility + dist * degradation)]
+  ifelse  dist > radius-of-operation ;; take into acount degradation if the consumer is outside of provider area
+  [report (utility - dist * degradation)]
   [report utility] 
 end
 
@@ -52,4 +53,18 @@ to behaviour-update-provider
   if random-float 1.0 < p-profile-switch
   [set profile ((profile + 1 + random 3) mod 4)]
   param-profile-provider
+end
+
+to store-rating-provider [ id v t ]
+  ;;#########################"
+  set rating-history replace-item history-index rating-history [0 0 0];; init the rating slot.
+  set rating-history (replace-item history-index rating-history
+                  (replace-item 0 (item history-index rating-history) id));;set the id of the selected provider
+  set rating-history (replace-item history-index rating-history
+                  (replace-item 1 (item history-index rating-history) v));;set the UG of the deal
+  set rating-history (replace-item history-index rating-history
+                  (replace-item 2 (item history-index rating-history) t));;set the time of the deal
+
+  ifelse history-index < history-size - 1 [ set history-index history-index + 1 ] [ set history-index 0 ] ;;inc the index of the history of rating
+  ;;#########################"
 end

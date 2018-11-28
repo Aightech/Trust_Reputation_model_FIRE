@@ -10,6 +10,7 @@ to init-consumer
   set activity random-float (max-activity-consumers - min-activity-consumers) + min-activity-consumers 
   ;;set rating-history array:from-list n-values history-size [0]
   set rating-history n-values history-size [[0 0 0]]
+  set history-index 0
   ;set trust-model? false
   random-position
   ;;init of each customer
@@ -35,8 +36,12 @@ to process-consumer
     [ set p choose(nearest-providers-id) ]
     [ set p one-of nearest-providers-id ]
     let utility 0
-    ask turtle p [ set utility performance-provider 2 * asin((distance myself) / 2) * pi / 180 ]
-    store-rating p utility ticks
+    ask turtle p [ 
+      set utility performance-provider(2 * asin((distance myself) / 2) * pi / 180)
+      print utility      
+      store-rating-provider who utility ticks
+    ]
+    store-rating-consumer p utility ticks
   ]
 end
 
@@ -117,7 +122,10 @@ to-report trust-witness [ p ]
 end
 
 to-report trust-certified [ p ]
-  let list-of-review review-of(p)
+  let list-of-review []
+  ask turtle p [    
+    set list-of-review rating-history
+  ]
   report compute-Tk(list-of-review)
 end
 
@@ -207,4 +215,22 @@ to-report review-of [ b ]
   ;print list-of-rating
   report list-of-rating
   ;;#########################
+end
+
+to store-rating-consumer [ id v t ]
+  ;;#########################"
+  ;;at the end of a deal
+  ;let id 23
+  ;let t 10
+  ;let v 5
+  set rating-history replace-item history-index rating-history [0 0 0];; init the rating slot.
+  set rating-history (replace-item history-index rating-history
+                  (replace-item 0 (item history-index rating-history) id));;set the id of the selected provider
+  set rating-history (replace-item history-index rating-history
+                  (replace-item 1 (item history-index rating-history) v));;set the UG of the deal
+  set rating-history (replace-item history-index rating-history
+                  (replace-item 2 (item history-index rating-history) t));;set the time of the deal
+
+  ifelse history-index < history-size - 1 [ set history-index history-index + 1 ] [ set history-index 0 ] ;;inc the index of the history of rating
+  ;;#########################"
 end
