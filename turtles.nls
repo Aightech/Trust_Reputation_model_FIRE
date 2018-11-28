@@ -5,8 +5,9 @@ turtles-own
   phi
   theta
   ;;;;--------------;;;;
-    rating-history;;
+  rating-history;;
   history-index
+  acquaintances
 ]
 
 
@@ -60,4 +61,29 @@ to draw-operation-radius
     set i i + 1
   ]
   pu
+end
+
+to set-acquaintances
+    ;;set acquaintances turtles in-radius (2 * asin((distance myself) / 2) * pi / 180) ;; !!! agent lui même contenu
+    ;;set acquaintances turtles with [distance myself > 0 AND distance myself < 2 * asin((radius-of-operation) / 2) * pi / 180]
+    set acquaintances other turtles in-radius (2 * asin((radius-of-operation) / 2) * pi / 180) ;; !!! agent lui même contenu
+  
+end
+
+to store-rating [ id v t ]
+  ;;#########################"
+  ;;at the end of a deal
+  ;let id 23
+  ;let t 10
+  ;let v 5
+  set rating-history replace-item history-index rating-history [0 0 0];; init the rating slot.
+  set rating-history (replace-item history-index rating-history
+                  (replace-item 0 (item history-index rating-history) id));;set the id of the selected provider
+  set rating-history (replace-item history-index rating-history
+                  (replace-item 1 (item history-index rating-history) v));;set the UG of the deal
+  set rating-history (replace-item history-index rating-history
+                  (replace-item 2 (item history-index rating-history) t));;set the time of the deal
+
+  ifelse history-index <= 1 [ set history-index history-index + 1 ] [ set history-index 0 ] ;;inc the index of the history of rating
+  ;;#########################"
 end

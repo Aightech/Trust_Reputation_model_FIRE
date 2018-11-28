@@ -24,6 +24,7 @@ to setup
   create-providers number-intermittent-providers [
     init-provider INTERMITTENT
   ]
+  ask turtles [set-acquaintances]
   update-plots
   reset-ticks
 end
@@ -42,6 +43,7 @@ to start
   ask turtles
   [
     move;
+    set-acquaintances
   ]
   pop-update
   ask providers
@@ -53,20 +55,18 @@ to start
   tick
 end
 
-
-
-
-
-
-
 to pop-update
   ;;kill a part of the population
-  ask n-of (ratio-cons-update * number-consumers) consumers[die]
-  ask n-of (ratio-prov-update * number-providers) providers[die]
-  ;;recreate this part of the population TODO take into account the profile
-  create-consumers ratio-cons-update * number-consumers [ init-consumer ]
-  create-providers ratio-prov-update * number-providers [ init-provider GOOD ]
-
+  let r-cons random-float ratio-cons-update
+  let r-prov random-float ratio-prov-update
+  ask n-of (r-cons * number-consumers) consumers[die]
+  ask n-of (r-prov * number-providers) providers[die]
+  ;;add new agents
+  create-consumers r-cons * number-consumers [ init-consumer ]
+  create-providers number-good-providers - count providers with [profile = GOOD] [ init-provider GOOD ]
+  create-providers number-ordinary-providers - count providers with [profile = ORDINARY] [ init-provider ORDINARY ]
+  create-providers number-bad-providers - count providers with [profile = BAD] [ init-provider BAD ]
+  create-providers number-intermittent-providers - count providers with [profile = INTERMITTENT] [ init-provider INTERMITTENT ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -178,7 +178,7 @@ number-consumers
 number-consumers
 0
 500
-1.0
+18.0
 1
 1
 NIL
@@ -199,7 +199,7 @@ NIL
 NIL
 NIL
 NIL
-1
+0
 
 SLIDER
 10
@@ -210,7 +210,7 @@ p-cons-move
 p-cons-move
 0
 1
-0.0
+0.23
 0.01
 1
 NIL
@@ -225,7 +225,7 @@ p-prov-move
 p-prov-move
 0
 1
-0.0
+0.2
 0.01
 1
 NIL
@@ -240,7 +240,7 @@ angle-max
 angle-max
 0
 360
-26.8
+71.4
 0.1
 1
 NIL
@@ -255,7 +255,7 @@ history-size
 history-size
 0
 10
-4.0
+10.0
 1
 1
 NIL
@@ -300,7 +300,7 @@ number-simulation
 number-simulation
 0
 1000
-1.0
+100.0
 1
 1
 rounds
@@ -315,7 +315,7 @@ number-good-providers
 number-good-providers
 0
 100
-6.0
+9.0
 1
 1
 NIL
@@ -330,7 +330,7 @@ number-ordinary-providers
 number-ordinary-providers
 0
 100
-0.0
+7.0
 1
 1
 NIL
@@ -345,7 +345,7 @@ number-intermittent-providers
 number-intermittent-providers
 0
 100
-5.0
+12.0
 1
 1
 NIL
@@ -360,7 +360,7 @@ number-bad-providers
 number-bad-providers
 0
 100
-0.0
+12.0
 1
 1
 NIL
@@ -386,7 +386,7 @@ min-activity-consumers
 min-activity-consumers
 0
 1
-0.85
+0.95
 0.05
 1
 NIL
@@ -416,7 +416,7 @@ radius-of-operation
 radius-of-operation
 0
 1
-0.5
+1.0
 0.1
 1
 NIL
@@ -474,7 +474,7 @@ SWITCH
 276
 drawing-r0
 drawing-r0
-0
+1
 1
 -1000
 
@@ -525,6 +525,23 @@ Temp
 1
 NIL
 HORIZONTAL
+
+BUTTON
+664
+95
+752
+128
+start once
+start
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+0
 
 @#$#@#$#@
 ## WHAT IS IT?

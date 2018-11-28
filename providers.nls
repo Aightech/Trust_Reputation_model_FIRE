@@ -4,7 +4,6 @@ providers-own
   profile;
   mu-perf;;perfomance moyenne 
   sig-perf;;ecart type
-  ;;rating-history;;
 ]
 
 to init-provider [prof]
@@ -13,12 +12,10 @@ to init-provider [prof]
   set profile prof
   param-profile-provider  
   ;;set rating-history array:from-list n-values history-size [0]
-  set rating-history array:from-list n-values history-size [0]
+  ;;set rating-history array:from-list n-values history-size [0]
   ;set trust-model? false
+  set rating-history n-values history-size [[0 0 0]]
   random-position
-  ;;init of each customer
-  let history-rating []
-  set history-index 0
 end
 
 to param-profile-provider
