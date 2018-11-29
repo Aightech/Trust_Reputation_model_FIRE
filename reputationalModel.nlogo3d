@@ -1,7 +1,7 @@
 extensions [array]
 __includes["turtles.nls" "consumers.nls" "providers.nls" "constant.nls"]
 
-globals [number-providers Temp]
+globals [number-providers Temp mean-UG]
 
 
 to setup
@@ -31,8 +31,7 @@ to setup
 end
 
 to start
-  print "==================="
-
+  ;print "==================="
 
   if ticks >= number-simulation
       [stop]
@@ -40,6 +39,7 @@ to start
   [
     process-consumer
   ]
+  set mean-UG (mean-UG / count consumers)
   ask turtles
   [
     move;
@@ -135,10 +135,10 @@ PENS
 "xcor" 1.0 1 -16777216 true "" "histogram [xcor] of turtles"
 
 PLOT
-257
-455
-457
-605
+52
+498
+252
+648
 ycor
 NIL
 NIL
@@ -153,10 +153,10 @@ PENS
 "ycor" 1.0 1 -16777216 true "" "histogram [ycor] of turtles"
 
 PLOT
-467
-455
-667
-605
+61
+521
+261
+671
 zcor
 NIL
 NIL
@@ -179,7 +179,7 @@ number-consumers
 number-consumers
 0
 500
-23.0
+500.0
 1
 1
 NIL
@@ -211,7 +211,7 @@ p-cons-move
 p-cons-move
 0
 1
-0.23
+0.1
 0.01
 1
 NIL
@@ -226,7 +226,7 @@ p-prov-move
 p-prov-move
 0
 1
-0.2
+0.1
 0.01
 1
 NIL
@@ -241,7 +241,7 @@ angle-max
 angle-max
 0
 360
-71.4
+9.3
 0.1
 1
 NIL
@@ -256,7 +256,7 @@ history-size
 history-size
 0
 10
-10.0
+5.0
 1
 1
 NIL
@@ -271,7 +271,7 @@ ratio-prov-update
 ratio-prov-update
 0
 1
-0.0
+0.07
 0.01
 1
 NIL
@@ -286,7 +286,7 @@ ratio-cons-update
 ratio-cons-update
 0
 1
-0.0
+0.09
 0.01
 1
 NIL
@@ -301,7 +301,7 @@ number-simulation
 number-simulation
 0
 1000
-74.0
+500.0
 1
 1
 rounds
@@ -316,7 +316,7 @@ number-good-providers
 number-good-providers
 0
 100
-24.0
+10.0
 1
 1
 NIL
@@ -331,7 +331,7 @@ number-ordinary-providers
 number-ordinary-providers
 0
 100
-0.0
+40.0
 1
 1
 NIL
@@ -346,7 +346,7 @@ number-intermittent-providers
 number-intermittent-providers
 0
 100
-0.0
+6.0
 1
 1
 NIL
@@ -361,7 +361,7 @@ number-bad-providers
 number-bad-providers
 0
 100
-0.0
+45.0
 1
 1
 NIL
@@ -387,7 +387,7 @@ min-activity-consumers
 min-activity-consumers
 0
 1
-0.95
+0.25
 0.05
 1
 NIL
@@ -417,7 +417,7 @@ radius-of-operation
 radius-of-operation
 0
 1
-0.1
+0.6
 0.1
 1
 NIL
@@ -432,7 +432,7 @@ M
 M
 0
 100
-0.0
+1.0
 1
 1
 NIL
@@ -447,7 +447,7 @@ p-muC
 p-muC
 0
 1001
-0.0
+0.1
 0.1
 1
 NIL
@@ -486,7 +486,7 @@ SWITCH
 241
 trust-interaction-model
 trust-interaction-model
-1
+0
 1
 -1000
 
@@ -508,7 +508,7 @@ SWITCH
 311
 trust-certified-model
 trust-certified-model
-0
+1
 1
 -1000
 
@@ -521,7 +521,7 @@ initial-temp
 initial-temp
 0
 70
-36.0
+26.0
 1
 1
 NIL
@@ -543,6 +543,24 @@ NIL
 NIL
 NIL
 0
+
+PLOT
+292
+420
+492
+570
+mean-UG
+round
+mean-UG
+0.0
+550.0
+-1.0
+0.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot mean-UG"
 
 @#$#@#$#@
 ## WHAT IS IT?

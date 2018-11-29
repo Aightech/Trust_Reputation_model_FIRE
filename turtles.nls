@@ -62,9 +62,6 @@ to draw-operation-radius
 end
 
 to set-acquaintances
-    ;;set acquaintances turtles in-radius (2 * asin((distance myself) / 2) * pi / 180) ;; !!! agent lui même contenu
-    ;;set acquaintances turtles with [distance myself > 0 AND distance myself < 2 * asin((radius-of-operation) / 2) * pi / 180]
-    set acquaintances other turtles in-radius (2 * asin((radius-of-operation) / 2) * pi / 180) ;; !!! agent lui même contenu
-  
+   set acquaintances other turtles in-radius (2 * asin((radius-of-operation) / 2) * pi / 180)
 end
 

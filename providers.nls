@@ -42,9 +42,13 @@ to-report performance-provider [dist] ;;determine the performance of a provider
   ifelse profile = INTERMITTENT ;; define performance regarding the profile
   [set utility (PL_BAD + random (PL_GOOD - PL_BAD))]
   [set utility random-normal mu-perf sig-perf]
-  ifelse  dist > radius-of-operation ;; take into acount degradation if the consumer is outside of provider area
-  [report (utility - dist * degradation)]
-  [report utility] 
+  if  dist > radius-of-operation ;; take into acount degradation if the consumer is outside of provider area
+  [set utility utility - dist * degradation]
+  if utility < -10
+  [set utility -10]
+  if utility > 10
+  [set utility 10]
+  report utility
 end
 
 to behaviour-update-provider
@@ -82,9 +86,9 @@ to store-rating-provider [ id v t ]
   set rating-history (replace-item index rating-history
                   (replace-item 0 (item index rating-history) id));;set the id of the selected provider
   set rating-history (replace-item index rating-history
-                  (replace-item 1 (item history-index rating-history) v));;set the UG of the deal
+                  (replace-item 1 (item index rating-history) v));;set the UG of the deal
   set rating-history (replace-item index rating-history
                   (replace-item 2 (item index rating-history) t));;set the time of the deal
-  
+  ;print rating-history
   ;;#########################"
 end
