@@ -38,7 +38,6 @@ to start
       [stop]
   ask consumers
   [
-    print "consumers"
     process-consumer
   ]
   ask turtles
@@ -52,8 +51,6 @@ to start
     behaviour-update-provider
   ]
   set Temp Temp * ( 1 - ticks / number-simulation)
-  print "Temp"
-  print Temp
   display
   ;;clear-drawing
   tick
@@ -182,7 +179,7 @@ number-consumers
 number-consumers
 0
 500
-51.0
+23.0
 1
 1
 NIL
@@ -304,7 +301,7 @@ number-simulation
 number-simulation
 0
 1000
-11.0
+74.0
 1
 1
 rounds
@@ -511,7 +508,7 @@ SWITCH
 311
 trust-certified-model
 trust-certified-model
-1
+0
 1
 -1000
 

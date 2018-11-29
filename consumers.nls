@@ -25,20 +25,18 @@ end
 to process-consumer
   if random-float 1.0 < activity ;; determine if the consumer ask for a service or not
   [
-    print "activity"
     ;;getProviders:list of 
     ;let nearest-providers min-n-of 10 providers [distance myself];; TODO 10 ?
     let nearest-providers min-n-of 10 providers [2 * asin((distance myself) / 2) * pi / 180];; TODO 10 ?
     let nearest-providers-id [who] of nearest-providers
     let p 0 ;; id of the provider we will ask a service
-    print nearest-providers-id
+    ;print nearest-providers-id
     ifelse trust-interaction-model or trust-witness-model or trust-certified-model 
     [ set p choose(nearest-providers-id) ]
     [ set p one-of nearest-providers-id ]
     let utility 0
     ask turtle p [ 
       set utility performance-provider(2 * asin((distance myself) / 2) * pi / 180)
-      print utility      
       store-rating-provider who utility ticks
     ]
     store-rating-consumer p utility ticks
@@ -46,7 +44,7 @@ to process-consumer
 end
 
 to-report choose [ nearest-providers-id ]
-  print "choose"
+  ;print "choose"
   let T-max -1
   let Id-max -1
   let Ti 0
@@ -83,6 +81,10 @@ to-report choose [ nearest-providers-id ]
     
     ifelse Tfound > 0 ;; if at least one value has been calculated
     [ 
+      print "T"
+      print Ti
+      print Tw
+      print Tc
       let T Ti + Tw + Tc ;; TODO: add weights
       set T-moy T-moy + T 
       set nb-T nb-T + 1
@@ -100,6 +102,7 @@ to-report choose [ nearest-providers-id ]
   ifelse nb-T > 0
   [
     set T-moy T-moy / nb-T
+    print T-max
     set proba exp(T-max / Temp) / (exp(T-max / Temp) + exp(T-moy / Temp))
     let choice random-float 1
     ifelse proba < choice and not empty? has-no-trust-value-list
@@ -126,6 +129,7 @@ to-report trust-certified [ p ]
   ask turtle p [    
     set list-of-review rating-history
   ]
+  print list-of-review
   report compute-Tk(list-of-review)
 end
 
@@ -189,10 +193,10 @@ to-report compute-Tk [ list-of-rating ]
       set i i + 1
     ]
   ]
-  print "Tk"
-  print Tk
-  print "D"
-  print denominator
+  ;print "Tk"
+  ;print Tk
+  ;print "D"
+  ;print denominator
   report Tk / denominator
   ;;#########################
 end

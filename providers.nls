@@ -57,14 +57,34 @@ end
 
 to store-rating-provider [ id v t ]
   ;;#########################"
-  set rating-history replace-item history-index rating-history [0 0 0];; init the rating slot.
-  set rating-history (replace-item history-index rating-history
-                  (replace-item 0 (item history-index rating-history) id));;set the id of the selected provider
-  set rating-history (replace-item history-index rating-history
+  
+  let index 0
+  ifelse history-index < history-size - 1
+  [    
+    set index history-index 
+    set history-index history-index + 1
+  ]
+  [
+    let min-v 10
+    let i 0
+    foreach rating-history
+    [
+      rate ->
+      if item 2 rate < min-v
+      [
+        set min-v (item 2 rate)
+        set index i
+      ]
+      set i (i + 1)
+    ]
+  ]
+  set rating-history replace-item index rating-history [0 0 0];; init the rating slot.
+  set rating-history (replace-item index rating-history
+                  (replace-item 0 (item index rating-history) id));;set the id of the selected provider
+  set rating-history (replace-item index rating-history
                   (replace-item 1 (item history-index rating-history) v));;set the UG of the deal
-  set rating-history (replace-item history-index rating-history
-                  (replace-item 2 (item history-index rating-history) t));;set the time of the deal
-
-  ifelse history-index < history-size - 1 [ set history-index history-index + 1 ] [ set history-index 0 ] ;;inc the index of the history of rating
+  set rating-history (replace-item index rating-history
+                  (replace-item 2 (item index rating-history) t));;set the time of the deal
+  
   ;;#########################"
 end
