@@ -11,7 +11,7 @@ to setup
   set number-providers number-good-providers + number-ordinary-providers + number-intermittent-providers + number-bad-providers
   set_constant
   create-consumers number-consumers [
-    init-consumer
+    init-consumer IT
   ]
   create-providers number-good-providers [
     init-provider GOOD
@@ -63,7 +63,7 @@ to pop-update
   ask n-of (r-cons * number-consumers) consumers[die]
   ask n-of (r-prov * number-providers) providers[die]
   ;;add new agents
-  create-consumers r-cons * number-consumers [ init-consumer ]
+  create-consumers r-cons * number-consumers [ init-consumer IT]
   create-providers number-good-providers - count providers with [profile = GOOD] [ init-provider GOOD ]
   create-providers number-ordinary-providers - count providers with [profile = ORDINARY] [ init-provider ORDINARY ]
   create-providers number-bad-providers - count providers with [profile = BAD] [ init-provider BAD ]
@@ -346,7 +346,7 @@ number-intermittent-providers
 number-intermittent-providers
 0
 100
-6.0
+5.0
 1
 1
 NIL
@@ -417,7 +417,7 @@ radius-of-operation
 radius-of-operation
 0
 1
-0.7
+0.4
 0.1
 1
 NIL
@@ -432,7 +432,7 @@ M
 M
 0
 100
-19.0
+0.0
 1
 1
 NIL
@@ -447,7 +447,7 @@ p-muC
 p-muC
 0
 1001
-0.1
+0.0
 0.1
 1
 NIL
@@ -475,7 +475,7 @@ SWITCH
 276
 drawing-r0
 drawing-r0
-1
+0
 1
 -1000
 
@@ -486,7 +486,7 @@ SWITCH
 241
 trust-interaction-model
 trust-interaction-model
-1
+0
 1
 -1000
 
@@ -508,7 +508,7 @@ SWITCH
 311
 trust-certified-model
 trust-certified-model
-0
+1
 1
 -1000
 
@@ -521,7 +521,7 @@ initial-temp
 initial-temp
 0
 70
-64.0
+1.0
 1
 1
 NIL
