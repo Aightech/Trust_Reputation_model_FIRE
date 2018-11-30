@@ -50,7 +50,7 @@ to start
   [
     behaviour-update-provider
   ]
-  set Temp Temp * ( 1 - ticks / number-simulation)
+  set Temp initial-temp - ticks * initial-temp / number-simulation
   display
   ;;clear-drawing
   tick
@@ -211,7 +211,7 @@ p-cons-move
 p-cons-move
 0
 1
-0.1
+0.0
 0.01
 1
 NIL
@@ -226,7 +226,7 @@ p-prov-move
 p-prov-move
 0
 1
-0.1
+0.0
 0.01
 1
 NIL
@@ -241,7 +241,7 @@ angle-max
 angle-max
 0
 360
-9.3
+0.0
 0.1
 1
 NIL
@@ -256,7 +256,7 @@ history-size
 history-size
 0
 10
-5.0
+10.0
 1
 1
 NIL
@@ -271,7 +271,7 @@ ratio-prov-update
 ratio-prov-update
 0
 1
-0.07
+0.0
 0.01
 1
 NIL
@@ -286,7 +286,7 @@ ratio-cons-update
 ratio-cons-update
 0
 1
-0.09
+0.0
 0.01
 1
 NIL
@@ -417,7 +417,7 @@ radius-of-operation
 radius-of-operation
 0
 1
-0.6
+0.7
 0.1
 1
 NIL
@@ -432,7 +432,7 @@ M
 M
 0
 100
-1.0
+19.0
 1
 1
 NIL
@@ -486,7 +486,7 @@ SWITCH
 241
 trust-interaction-model
 trust-interaction-model
-0
+1
 1
 -1000
 
@@ -508,7 +508,7 @@ SWITCH
 311
 trust-certified-model
 trust-certified-model
-1
+0
 1
 -1000
 
@@ -521,7 +521,7 @@ initial-temp
 initial-temp
 0
 70
-26.0
+64.0
 1
 1
 NIL

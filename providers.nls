@@ -86,7 +86,7 @@ to store-rating-provider [ id v t ]
   set rating-history (replace-item index rating-history
                   (replace-item 0 (item index rating-history) id));;set the id of the selected provider
   set rating-history (replace-item index rating-history
-                  (replace-item 1 (item index rating-history) v));;set the UG of the deal
+                  (replace-item 1 (item index rating-history) (v / 10)));;set the UG of the deal
   set rating-history (replace-item index rating-history
                   (replace-item 2 (item index rating-history) t));;set the time of the deal
   ;print rating-history
