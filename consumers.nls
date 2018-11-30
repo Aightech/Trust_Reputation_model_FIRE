@@ -3,15 +3,13 @@ breed [ consumers consumer ]
 consumers-own
 [
   activity;;alpha
-  model;
 ]
 
-to init-consumer [modl]
+to init-consumer 
   set color blue
   set activity random-float (max-activity-consumers - min-activity-consumers) + min-activity-consumers 
   set rating-history n-values history-size [[0 0 0]]
   set history-index 0
-  set model modl
   random-position
   
 end
@@ -49,21 +47,21 @@ to-report choose [ nearest-providers-id ]
   
   foreach nearest-providers-id
   [ p ->
-    if model = IT ;interaction
+    if trust-interaction-model ;interaction
     [
-      print "IT"
+      ;print "IT"
       set T-to-find T-to-find + 1
       set Ti trust-interaction(p)
       ifelse Ti = -2 [ set Ti 0 ][ set Tfound Tfound + 1]
     ]
-    if model = W ;witness
+    if trust-witness-model ;witness
     [
       set T-to-find T-to-find + 1
       set Tw trust-witness(p)
       ifelse Tw = -2 [ set Tw 0 ][ set Tfound Tfound + 1]
       
     ]
-    if model = C ;certified 
+    if trust-certified-model ;certified 
     [
       set T-to-find T-to-find + 1
       set Tc trust-certified(p)

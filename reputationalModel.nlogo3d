@@ -11,7 +11,7 @@ to setup
   set number-providers number-good-providers + number-ordinary-providers + number-intermittent-providers + number-bad-providers
   set_constant
   create-consumers number-consumers [
-    init-consumer IT
+    init-consumer
   ]
   create-providers number-good-providers [
     init-provider GOOD
@@ -63,7 +63,7 @@ to pop-update
   ask n-of (r-cons * number-consumers) consumers[die]
   ask n-of (r-prov * number-providers) providers[die]
   ;;add new agents
-  create-consumers r-cons * number-consumers [ init-consumer IT]
+  create-consumers r-cons * number-consumers [ init-consumer ]
   create-providers number-good-providers - count providers with [profile = GOOD] [ init-provider GOOD ]
   create-providers number-ordinary-providers - count providers with [profile = ORDINARY] [ init-provider ORDINARY ]
   create-providers number-bad-providers - count providers with [profile = BAD] [ init-provider BAD ]
@@ -117,10 +117,10 @@ NIL
 1
 
 PLOT
-49
-455
-249
-605
+545
+386
+745
+536
 xcor
 NIL
 NIL
@@ -135,10 +135,10 @@ PENS
 "xcor" 1.0 1 -16777216 true "" "histogram [xcor] of turtles"
 
 PLOT
-52
-498
-252
-648
+548
+429
+748
+579
 ycor
 NIL
 NIL
@@ -153,10 +153,10 @@ PENS
 "ycor" 1.0 1 -16777216 true "" "histogram [ycor] of turtles"
 
 PLOT
-61
-521
-261
-671
+557
+452
+757
+602
 zcor
 NIL
 NIL
@@ -203,10 +203,10 @@ NIL
 0
 
 SLIDER
-10
-179
-145
-212
+13
+217
+148
+250
 p-cons-move
 p-cons-move
 0
@@ -218,10 +218,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-11
-215
-146
-248
+14
+253
+149
+286
 p-prov-move
 p-prov-move
 0
@@ -233,10 +233,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-11
-251
-147
-284
+14
+289
+150
+322
 angle-max
 angle-max
 0
@@ -248,10 +248,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-188
-167
-360
-200
+15
+178
+187
+211
 history-size
 history-size
 0
@@ -263,10 +263,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-9
-323
-191
-356
+12
+361
+194
+394
 ratio-prov-update
 ratio-prov-update
 0
@@ -278,10 +278,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-8
-360
-191
-393
+11
+398
+194
+431
 ratio-cons-update
 ratio-cons-update
 0
@@ -368,9 +368,9 @@ NIL
 HORIZONTAL
 
 MONITOR
-666
+664
 10
-803
+801
 55
 total number of providers
 number-good-providers + number-ordinary-providers + number-intermittent-providers + number-bad-providers
@@ -409,10 +409,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-279
-321
-451
-354
+196
+177
+368
+210
 radius-of-operation
 radius-of-operation
 0
@@ -424,10 +424,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-435
-166
-607
-199
+397
+201
+569
+234
 M
 M
 0
@@ -439,25 +439,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-438
-212
-610
-245
+400
+247
+572
+280
 p-muC
 p-muC
 0
 1001
-0.0
+0.1
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-439
-258
-611
-291
+401
+293
+573
+326
 p-profile-switch
 p-profile-switch
 0
@@ -469,10 +469,10 @@ NIL
 HORIZONTAL
 
 SWITCH
-738
-243
-871
-276
+666
+60
+799
+93
 drawing-r0
 drawing-r0
 0
@@ -480,10 +480,10 @@ drawing-r0
 -1000
 
 SWITCH
-153
-208
-376
-241
+165
+224
+388
+257
 trust-interaction-model
 trust-interaction-model
 0
@@ -491,10 +491,10 @@ trust-interaction-model
 -1000
 
 SWITCH
-153
-243
-351
-276
+165
+259
+363
+292
 trust-witness-model
 trust-witness-model
 1
@@ -502,10 +502,10 @@ trust-witness-model
 -1000
 
 SWITCH
-153
-278
-356
-311
+165
+294
+368
+327
 trust-certified-model
 trust-certified-model
 1
@@ -513,15 +513,15 @@ trust-certified-model
 -1000
 
 SLIDER
-525
-399
-697
-432
+589
+194
+761
+227
 initial-temp
 initial-temp
 0
 70
-1.0
+9.0
 1
 1
 NIL
@@ -545,10 +545,10 @@ NIL
 0
 
 PLOT
-292
-420
-492
-570
+18
+440
+251
+609
 mean-UG
 round
 mean-UG
@@ -561,6 +561,45 @@ false
 "" ""
 PENS
 "default" 1.0 0 -16777216 true "" "plot mean-UG"
+
+PLOT
+258
+441
+502
+561
+Profile of providers
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+true
+"" ""
+PENS
+"INTERMITENT" 1.0 0 -1664597 true "" "plot count providers with [profile = INTERMITTENT]"
+"GOOD" 1.0 0 -10899396 true "" "plot count providers with [profile = GOOD]"
+"BAD" 1.0 0 -7500403 true "" "plot count providers with [profile = BAD]"
+"ORDINARY" 1.0 0 -2674135 true "" "plot count providers with [profile = ORDINARY]"
+
+PLOT
+593
+247
+761
+367
+Evolution temperature
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot  Temp"
 
 @#$#@#$#@
 ## WHAT IS IT?

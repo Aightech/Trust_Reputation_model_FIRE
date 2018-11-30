@@ -1,6 +1,5 @@
 globals [PL_PERFECT PL_GOOD PL_OK PL_WORST PL_BAD GOOD ORDINARY BAD INTERMITTENT sig_good sig_ordinary sig_bad 
-  degradation lambda nBF nRL
-  NOTRUST IT W C ALL]
+  degradation lambda nBF nRL]
 
 to set_constant
   set PL_PERFECT 10
@@ -15,13 +14,8 @@ to set_constant
   set sig_good 1.0 ;; standart deviation for good profiles
   set sig_ordinary 2.0 ;; standart deviation for ordinary profiles
   set sig_bad 2.0 ;; standart deviation for bad profiles
-  set degradation 0 ;; linear coefficient for degradation of the perf of providers regarding the distance
+  set degradation 1 ;; linear coefficient for degradation of the perf of providers regarding the distance
   set lambda -5 / ln(0.5)
   set nBF 2
   set nRL 5
-  set NOTRUST 0
-  set IT 1
-  set W 2
-  set C 3
-  set ALL 4
 end
