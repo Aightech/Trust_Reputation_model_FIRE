@@ -86,9 +86,7 @@ to start
   set mean-UG-certifi-only 0
   set stand-dev-UG 0
   set list-UG []
-  set list-UG-interac-only []
-  set list-UG-witness-only []
-  set list-UG-certifi-only []
+
   ask consumers
   [
     process-consumer

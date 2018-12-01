@@ -2,7 +2,6 @@ extensions [csv]
 globals [PL_PERFECT PL_GOOD PL_OK PL_WORST PL_BAD GOOD ORDINARY BAD INTERMITTENT 
   sig_good sig_ordinary sig_bad 
   degradation lambda nBF nRL
-  wI wW wC
   gamma
   history-size
   data-list
@@ -27,10 +26,7 @@ to set_constant
   set lambda (-5 / ln(0.5))
   set nBF 2
   set nRL 5
-  
-  set wI 2
-  set wW 1
-  set wC 0.5
+
   
   set gamma (-1 * ln(0.5)) 
   set history-size 10

@@ -3,6 +3,9 @@ breed [ consumers consumer ]
 consumers-own
 [
   activity ;; alpha in the article
+  wI
+  wW
+  wC
 ]
 
 to init-consumer 
@@ -12,6 +15,9 @@ to init-consumer
   set rating-history n-values history-size [[0 0 0]]
   set history-index 0
   random-position
+  set wI 2
+  set wW 1
+  set wC 0.5
 end
 
 to  process-consumer
@@ -31,7 +37,11 @@ to  process-consumer
       set utility performance-provider(2 * asin((distance myself) / 2) * pi / 180)
       store-rating-provider p utility ticks
       set list-UG lput utility list-UG
+      
     ]
+    if wW = 0 and wC = 0 [ set list-UG-interac-only lput utility list-UG-interac-only ]
+    if wI = 0 and wC = 0 [ set list-UG-witness-only lput utility list-UG-witness-only ]
+    if wW = 0 and wI = 0 [ set list-UG-certifi-only lput utility list-UG-certifi-only ]
     store-rating-consumer p utility ticks
   ]
 end
