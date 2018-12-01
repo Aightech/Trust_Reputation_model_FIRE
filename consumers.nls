@@ -27,9 +27,9 @@ to  process-consumer
     ask turtle p [ 
       set utility performance-provider(2 * asin((distance myself) / 2) * pi / 180)
       store-rating-provider p utility ticks
+      set list-UG lput utility list-UG
     ]
     store-rating-consumer p utility ticks
-    set mean-UG mean-UG + utility
   ]
 end
 
