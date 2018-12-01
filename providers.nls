@@ -7,6 +7,7 @@ providers-own
 ]
 
 to init-provider [prof]
+  ;; initialize properties of a provider turtle of profile prof
   set color red
   random-position
   set profile prof
@@ -20,6 +21,7 @@ to init-provider [prof]
 end
 
 to param-profile-provider
+  ;; set the parameters of a provider regarding its profile
   if profile = GOOD
   [
     set mu-perf (PL_GOOD + random (PL_PERFECT - PL_GOOD))
@@ -37,7 +39,8 @@ to param-profile-provider
   ]
 end
 
-to-report performance-provider [dist] ;;determine the performance of a provider
+to-report performance-provider [dist] 
+  ;; calculate the performance of a provider
   let utility 0
   ifelse profile = INTERMITTENT ;; define performance regarding the profile
   [set utility (PL_BAD + random (PL_GOOD - PL_BAD))]
@@ -52,6 +55,7 @@ to-report performance-provider [dist] ;;determine the performance of a provider
 end
 
 to behaviour-update-provider
+  ;; update the behaviour of a provider
   if random-float 1.0 < p-muC
   [
     set mu-perf (mu-perf - M + random (2 * M))]
@@ -63,8 +67,7 @@ to behaviour-update-provider
 end
 
 to store-rating-provider [ id v t ]
-  ;;#########################"
-  
+  ;; store the 10 best ratings of a provider  
   let index 0
   ifelse history-index < history-size - 1
   [    
@@ -92,6 +95,4 @@ to store-rating-provider [ id v t ]
                   (replace-item 1 (item index rating-history) (v / 10)));;set the UG of the deal
   set rating-history (replace-item index rating-history
                   (replace-item 2 (item index rating-history) t));;set the time of the deal
-  ;print rating-history
-  ;;#########################"
 end

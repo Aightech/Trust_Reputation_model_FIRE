@@ -2,27 +2,30 @@ breed [ consumers consumer ]
 
 consumers-own
 [
-  activity;;alpha
+  activity ;; alpha in the article
 ]
 
 to init-consumer 
+  ;; initialize properties of a consumer turtle
   set color blue
   set activity random-float (max-activity-consumers - min-activity-consumers) + min-activity-consumers 
   set rating-history n-values history-size [[0 0 0]]
   set history-index 0
   random-position
-  
 end
 
 to  process-consumer
+  ;; if the consumer ask for a service, find the supposed best provider and evaluate its performance
   if random-float 1.0 < activity ;; determine if the consumer ask for a service or not
   [
-    let nearest-providers min-n-of 10 providers [2 * asin((distance myself) / 2) * pi / 180];; TODO 10 ?
+    ;; find the provider
+    let nearest-providers min-n-of 10 providers [2 * asin((distance myself) / 2) * pi / 180]
     let nearest-providers-id [who] of nearest-providers
-    let p 0 ;; id of the provider we will ask a service
+    let p 0 ; id of the provider we will ask a service
     ifelse trust-interaction-model or trust-witness-model or trust-certified-model 
-    [ set p choose(nearest-providers-id) ]
-    [ set p one-of nearest-providers-id ]
+    [ set p choose(nearest-providers-id) ] ; if trust model
+    [ set p one-of nearest-providers-id ] ; if no trus model
+    ;; calculate the performance of the provider
     let utility 0
     ask turtle p [ 
       set utility performance-provider(2 * asin((distance myself) / 2) * pi / 180)
@@ -34,44 +37,39 @@ to  process-consumer
 end
 
 to-report choose [ nearest-providers-id ]
-  ;print "- choose"
+  ;; return a the supposed best provider
   let T-max -1
   let id-max -1
   let res 0
-  let T_k 0
-  let rho_k 0
-  let denominator_T 0
-  let numerator_T 0
-  
-  let T 0
-  
-  let T-to-find 0
+  let T_k 0 ; trust value
+  let rho_k 0 ; reliabitlity
   let Tfound 0
+  let denominator_T 0
+  let numerator_T 0  
+  let T 0  ; global trust value
   let nb-T 0
   let T-moy 0
   let has-no-trust-value-list []
   
   foreach nearest-providers-id
   [ p ->
-    ;print " ----"
     set denominator_T 0
     set numerator_T 0
-    if trust-interaction-model ;interaction
+    
+    ;; Interaction Trust
+    if trust-interaction-model 
     [
-      ;print "IT"
-      set T-to-find T-to-find + 1
       set res trust-interaction(p)
       set T_k item 0 res
-      ;print T_k
       ifelse T_k = -2 [set T_k 0][set Tfound Tfound + 1]
       set rho_k item 1 res   
-      ;print rho_k     
       set numerator_T numerator_T + wI * T_k * rho_k 
       set denominator_T denominator_T + ( wI * rho_k ) 
     ]
-    if trust-witness-model ;witness
+    
+    ;; Witness Reputation
+    if trust-witness-model 
     [
-      set T-to-find T-to-find + 1
       set res trust-witness(p)
       set T_k item 0 res
       ifelse T_k = -2 [set T_k 0][set Tfound Tfound + 1]
@@ -79,9 +77,10 @@ to-report choose [ nearest-providers-id ]
       set numerator_T numerator_T + wW * T_k * rho_k  
       set denominator_T denominator_T + ( wW * rho_k )   
     ]
-    if trust-certified-model ;certified 
+    
+    ;; Certified Reputation
+    if trust-certified-model
     [
-      set T-to-find T-to-find + 1
       set res trust-certified(p)
       set T_k item 0 res
       ifelse T_k = -2 [set T_k 0][set Tfound Tfound + 1]
@@ -89,22 +88,21 @@ to-report choose [ nearest-providers-id ]
       set numerator_T numerator_T + wC * T_k * rho_k 
       set denominator_T denominator_T + ( wC * rho_k )
     ]    
-    ;print "T"
-    ;print Tfound
+    
     ifelse Tfound > 0 ;; if at least one value has been calculated
     [ 
       ifelse denominator_T != 0 
-      [ set T numerator_T / denominator_T ][set T 0]  ;; TODO: add weights
+      [ set T numerator_T / denominator_T ][set T 0]
       set T-moy T-moy + T 
       set nb-T nb-T + 1
-      
-      ;print T
       if T >= T-max 
       [
-        set T-max T
-        set id-max p
+        set T-max T ; save the current best trust value
+        set id-max p ; save the id of the current best provider
       ]
     ]
+    
+    ;; No Trust
     [
       set has-no-trust-value-list lput p has-no-trust-value-list
     ]
@@ -117,51 +115,41 @@ to-report choose [ nearest-providers-id ]
     set proba exp(T-max / Temp) / (exp(T-max / Temp) + exp(T-moy / Temp))
     let rand random-float 1
     ifelse rand > proba and not empty? has-no-trust-value-list        
-    [ ;print "exploration"
-      report one-of has-no-trust-value-list ] ;;
-    [ ;print "exploitation"
-      ;print id-max
-      report id-max ]
+    ;; Exploration
+    [ report one-of has-no-trust-value-list ] 
+    ;; Exploitation
+    [ report id-max ]
   ]
+  ;; No Trust value calculated
   [report one-of has-no-trust-value-list ]
 end
 
 to-report trust-interaction [ p ]
+  ;; for Interaction Trust model
+  ;; return the trust value and reliability of an interaction between a consumer and provider p
   let list-of-review review-of(p)
   report compute-Tk(list-of-review)
 end
 
 to-report trust-witness [ p ]
-  ;;let list-of-review tree-consumers-review p 5 []
-  let list-of-review tree-consumers-review2 p nRL
+  ;; for Witness Reputation model
+  ;; return the trust value and reliability of an interaction between a consumer and provider p
+  let list-of-review tree-consumers-review p nRL
   report compute-Tk(list-of-review)
 end
 
 to-report trust-certified [ p ]
+  ;; for Certified Reputation model
+  ;; return the trust value and reliability of an interaction between a consumer and provider p
   let list-of-review []
-  ;print p
   ask turtle p [    
     set list-of-review rating-history
-    ;print rating-history
   ]
   report compute-Tk(list-of-review)
 end
 
-to-report tree-consumers-review [ p i close-list]
-  let list-of-review review-of(p)
-  ifelse empty? list-of-review 
-  [ 
-    let close-consumers (consumers with [2 * asin((distance myself) / 2) * pi / 180 < radius-of-operation and (position who close-list) = false ])
-    ask close-consumers 
-    [
-      set list-of-review sentence list-of-review tree-consumers-review p (i - 1) []
-    ]
-    report  []
-  ]
-  [ report list-of-review ]
-end
-
-to-report tree-consumers-review2 [ p n ]
+to-report tree-consumers-review [ p n ]
+  ;; build the list of ratings of provider p from connected agents
   let consumers-acquaintances acquaintances with [breed = consumers] ;; extract consumers from acquaintances
   let n-cons min list nBF count consumers-acquaintances  
   let query-list min-n-of n-cons consumers-acquaintances [2 * asin((distance myself) / 2) * pi / 180] ;; extact nBF closest consumers
@@ -172,7 +160,7 @@ to-report tree-consumers-review2 [ p n ]
     set temp-list-of-ratings review-of p    
     ifelse empty? temp-list-of-ratings AND n > 0
     [
-      set list-of-ratings sentence tree-consumers-review2 p (n - 1) list-of-ratings
+      set list-of-ratings sentence tree-consumers-review p (n - 1) list-of-ratings
     ]
     [
       set list-of-ratings sentence temp-list-of-ratings list-of-ratings
@@ -182,8 +170,7 @@ to-report tree-consumers-review2 [ p n ]
 end
 
 to-report compute-Tk [ list-of-rating ]
-  ;;#########################
-  ;;compute TK with the list L not empty and return TK
+  ;; compute TK with the list L not empty and return TK
   let w 0
   let sum_w 0
   let Tk 0
@@ -217,12 +204,10 @@ to-report compute-Tk [ list-of-rating ]
     ;print deviation-reliability
     report (list Tk (rating-reliability * deviation-reliability))
   ]
-  ;;#########################
 end
 
 to-report review-of [ b ]
-  ;;#########################
-  ;;if ask list of transaction with agent b  >> to-report average [a b]report (a + b) / 2
+  ;; if ask list of transaction with agent b 
   let list-of-rating []
   foreach rating-history
   [
@@ -233,11 +218,9 @@ to-report review-of [ b ]
     ]
   ]
   report list-of-rating
-  ;;#########################
 end
 
 to store-rating-consumer [ id v t ]
-  ;;#########################"
   ;;at the end of a deal
   set rating-history replace-item history-index rating-history [0 0 0];; init the rating slot.
   set rating-history (replace-item history-index rating-history
@@ -248,5 +231,4 @@ to store-rating-consumer [ id v t ]
                   (replace-item 2 (item history-index rating-history) t));;set the time of the deal
 
   ifelse history-index < history-size - 1 [ set history-index history-index + 1 ] [ set history-index 0 ] ;;inc the index of the history of rating
-  ;;#########################"
 end
