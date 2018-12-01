@@ -77,6 +77,8 @@ to start
     behaviour-update-provider
   ]
   set Temp initial-temp - ticks * initial-temp / number-simulation
+
+  save-data
   display
   ;;clear-drawing
   tick
@@ -691,6 +693,23 @@ TEXTBOX
 Settings for a dynamic environment:
 11
 0.0
+1
+
+BUTTON
+831
+235
+975
+277
+export measures
+export-measures
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
 1
 
 @#$#@#$#@

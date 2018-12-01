@@ -1,9 +1,12 @@
+extensions [csv]
 globals [PL_PERFECT PL_GOOD PL_OK PL_WORST PL_BAD GOOD ORDINARY BAD INTERMITTENT 
   sig_good sig_ordinary sig_bad 
   degradation lambda nBF nRL
   wI wW wC
   gamma
-  history-size]
+  history-size
+  data-list
+]
 
 to set_constant
   set PL_PERFECT 10
@@ -31,4 +34,26 @@ to set_constant
   
   set gamma (-1 * ln(0.5)) 
   set history-size 10
+  set data-list [["Ticks" "Temperature" "Mean UG" "Std Dev UG" ]]
+end
+
+to save-data
+  set data-list lput (list ticks Temp mean-UG stand-dev-UG) data-list 
+  
+end
+
+to export-measures
+  let name "test"
+;  if do_IT [set name (word name "IT-")]
+;  if do_WR [set name (word name "WR-")]
+;  if do_CR [set name (word name "CR-")]
+;  if DYNAMIC_ENV [set name (word name "Dyn-")]
+
+  let date date-and-time
+  set date substring date 0 13
+  set date remove ":" date
+  set date remove " " date
+  set date remove "." date
+
+  csv:to-file (word "SAVE_" name date ".csv") (data-list)
 end
