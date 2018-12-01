@@ -18,12 +18,16 @@ to reset-settings-static
   set M 0
   set p-muC 0
   set p-profile-switch 0
+  set radius-of-operation 0.2
 end
 
 to setup
   clear-all
   zoom 62
   set Temp initial-Temp
+  set mean-UG 0
+  set stand-dev-UG 0
+  set list-UG []
   set number-providers number-good-providers + number-ordinary-providers + number-intermittent-providers + number-bad-providers
   set_constant
   create-consumers number-consumers [
@@ -139,10 +143,10 @@ NIL
 1
 
 PLOT
-214
-607
-414
-757
+209
+667
+409
+817
 xcor
 NIL
 NIL
@@ -157,10 +161,10 @@ PENS
 "xcor" 1.0 1 -16777216 true "" "histogram [xcor * 10] of turtles"
 
 PLOT
-427
-611
-627
-761
+422
+671
+622
+821
 ycor
 NIL
 NIL
@@ -175,10 +179,10 @@ PENS
 "ycor" 1.0 1 -16777216 true "" "histogram [ycor * 10] of turtles"
 
 PLOT
-639
-608
-839
-758
+634
+668
+834
+818
 zcor
 NIL
 NIL
@@ -225,12 +229,27 @@ NIL
 0
 
 SLIDER
+15
+587
+150
+620
+p-cons-move
+p-cons-move
+0
+1
+0.0
+0.01
+1
+NIL
+HORIZONTAL
+
+SLIDER
 16
-477
+623
 151
-510
-p-cons-move
-p-cons-move
+656
+p-prov-move
+p-prov-move
 0
 1
 0.0
@@ -240,25 +259,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-17
-513
+16
+659
 152
-546
-p-prov-move
-p-prov-move
-0
-1
-0.0
-0.01
-1
-NIL
-HORIZONTAL
-
-SLIDER
-17
-549
-153
-582
+692
 angle-max
 angle-max
 0
@@ -270,25 +274,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-666
-100
-802
-133
-history-size
-history-size
-0
-10
-10.0
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-16
-398
-190
-431
+15
+508
+189
+541
 ratio-prov-update
 ratio-prov-update
 0
@@ -300,10 +289,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-15
-435
-188
-468
+14
+545
+187
+578
 ratio-cons-update
 ratio-cons-update
 0
@@ -323,7 +312,7 @@ number-simulation
 number-simulation
 0
 1000
-512.0
+206.0
 1
 1
 rounds
@@ -431,25 +420,25 @@ NIL
 HORIZONTAL
 
 SLIDER
-17
-350
-189
-383
+664
+100
+802
+133
 radius-of-operation
 radius-of-operation
 0
 1
-0.4
+0.2
 0.1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-17
-594
-189
-627
+16
+704
+188
+737
 M
 M
 0
@@ -461,10 +450,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-16
-638
-188
-671
+15
+748
+187
+781
 p-muC
 p-muC
 0
@@ -476,10 +465,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-15
-678
-187
-711
+14
+788
+186
+821
 p-profile-switch
 p-profile-switch
 0
@@ -502,21 +491,21 @@ drawing-r0
 -1000
 
 SWITCH
-20
-233
-188
-266
+85
+242
+253
+275
 trust-interaction-model
 trust-interaction-model
-1
+0
 1
 -1000
 
 SWITCH
-20
-268
-189
-301
+338
+244
+507
+277
 trust-witness-model
 trust-witness-model
 1
@@ -524,10 +513,10 @@ trust-witness-model
 -1000
 
 SWITCH
-20
-303
-190
-336
+593
+244
+763
+277
 trust-certified-model
 trust-certified-model
 1
@@ -535,16 +524,16 @@ trust-certified-model
 -1000
 
 SLIDER
-657
-240
-821
-273
+15
+299
+179
+332
 initial-temp
 initial-temp
 0
-70
-3.0
-1
+10
+3.5
+0.1
 1
 NIL
 HORIZONTAL
@@ -567,28 +556,28 @@ NIL
 0
 
 PLOT
-209
-236
-442
-405
+204
+296
+437
+465
 mean-UG
 round
 mean-UG
 0.0
-550.0
+200.0
 -1.0
 0.0
 true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot mean-UG"
+"default" 1.0 0 -10899396 true "" "plot mean-UG"
 
 PLOT
-209
-413
-444
-586
+204
+473
+472
+646
 Profile of providers
 NIL
 NIL
@@ -606,10 +595,10 @@ PENS
 "ORDINARY" 1.0 0 -2674135 true "" "plot count providers with [profile = ORDINARY]"
 
 PLOT
-655
-279
-823
-399
+13
+338
+181
+458
 Evolution temperature
 NIL
 NIL
@@ -621,7 +610,7 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot  Temp"
+"default" 1.0 0 -955883 true "" "plot  Temp"
 
 BUTTON
 14
@@ -641,10 +630,10 @@ NIL
 1
 
 PLOT
-445
-237
-645
-402
+440
+297
+622
+462
 standart deviation UG
 NIL
 NIL
@@ -656,17 +645,35 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot stand-dev-UG"
+"default" 1.0 0 -13345367 true "" "plot stand-dev-UG"
 
 PLOT
-460
-428
-660
-578
-plot 1
-NIL
-NIL
+482
+473
+826
+644
+Mean performance of providers
+mean performance level
+number of providers
+-10.0
+10.0
 0.0
+15.0
+false
+false
+"" ""
+PENS
+"default" 1.0 0 -2674135 true "" "histogram [mu-perf] of providers"
+
+PLOT
+633
+297
+823
+459
+UG gain by each consumer
+UG gain
+number of consumers
+-10.0
 10.0
 0.0
 10.0
@@ -674,25 +681,17 @@ true
 false
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "histogram [mu-perf] of providers"
+"default" 1.0 0 -16777216 true "" "histogram list-UG"
 
-PLOT
-671
-429
-878
-577
-plot 2
-NIL
-NIL
+TEXTBOX
+16
+481
+207
+509
+Settings for a dynamic environment:
+11
 0.0
-10.0
-0.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "histogram [sig-perf] of providers"
+1
 
 @#$#@#$#@
 ## WHAT IS IT?

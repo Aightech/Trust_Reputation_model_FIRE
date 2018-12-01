@@ -2,7 +2,8 @@ globals [PL_PERFECT PL_GOOD PL_OK PL_WORST PL_BAD GOOD ORDINARY BAD INTERMITTENT
   sig_good sig_ordinary sig_bad 
   degradation lambda nBF nRL
   wI wW wC
-  gamma]
+  gamma
+  history-size]
 
 to set_constant
   set PL_PERFECT 10
@@ -29,4 +30,5 @@ to set_constant
   set wC 0.5
   
   set gamma (-1 * ln(0.5)) 
+  set history-size 10
 end

@@ -53,10 +53,13 @@ end
 
 to behaviour-update-provider
   if random-float 1.0 < p-muC
-  [set mu-perf (mu-perf - M + random (2 * M))]
+  [
+    set mu-perf (mu-perf - M + random (2 * M))]
   if random-float 1.0 < p-profile-switch
-  [set profile ((profile + 1 + random 3) mod 4)]
-  param-profile-provider
+  [
+    set profile ((profile + 1 + random 3) mod 4)
+    param-profile-provider]
+
 end
 
 to store-rating-provider [ id v t ]
