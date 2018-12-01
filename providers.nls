@@ -43,7 +43,7 @@ to-report performance-provider [dist] ;;determine the performance of a provider
   [set utility (PL_BAD + random (PL_GOOD - PL_BAD))]
   [set utility random-normal mu-perf sig-perf]
   if  dist > radius-of-operation ;; take into acount degradation if the consumer is outside of provider area
-  [set utility utility - dist * degradation]
+  [set utility utility - (dist - radius-of-operation) * degradation]
   if utility < -10
   [set utility -10]
   if utility > 10

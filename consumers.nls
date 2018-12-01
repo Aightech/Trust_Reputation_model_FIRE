@@ -34,44 +34,69 @@ to  process-consumer
 end
 
 to-report choose [ nearest-providers-id ]
+  ;print "- choose"
   let T-max -1
   let id-max -1
-  let Ti 0
-  let Tw 0
-  let Tc 0
-  let Tfound 0
+  let res 0
+  let T_k 0
+  let rho_k 0
+  let denominator_T 0
+  let numerator_T 0
+  
+  let T 0
+  
   let T-to-find 0
+  let Tfound 0
   let nb-T 0
   let T-moy 0
   let has-no-trust-value-list []
   
   foreach nearest-providers-id
   [ p ->
+    ;print " ----"
     if trust-interaction-model ;interaction
     [
       ;print "IT"
       set T-to-find T-to-find + 1
-      set Ti trust-interaction(p)
-      ifelse Ti = -2 [ set Ti 0 ][ set Tfound Tfound + 1]
+      set res trust-interaction(p)
+      set T_k item 0 res
+      ;print T_k
+      ifelse T_k = -2 [set T_k 0][set Tfound Tfound + 1]
+      set rho_k item 1 res   
+      ;print rho_k     
+      set denominator_T denominator_T + ( wI * rho_k ) 
+      set numerator_T numerator_T + wI * T_k * rho_k 
     ]
     if trust-witness-model ;witness
     [
       set T-to-find T-to-find + 1
-      set Tw trust-witness(p)
-      ifelse Tw = -2 [ set Tw 0 ][ set Tfound Tfound + 1]
-      
+      set res trust-witness(p)
+      set T_k item 0 res
+      ifelse T_k = -2 [set T_k 0][set Tfound Tfound + 1]
+      set rho_k item 1 res        
+      set denominator_T denominator_T + ( wW * rho_k )  
+      set numerator_T numerator_T + wW * T_k * rho_k     
     ]
     if trust-certified-model ;certified 
     [
       set T-to-find T-to-find + 1
-      set Tc trust-certified(p)
-      ifelse Tc = -2 [ set Tc 0 ][ set Tfound Tfound + 1]
+      set res trust-certified(p)
+      set T_k item 0 res
+      ifelse T_k = -2 [set T_k 0][set Tfound Tfound + 1]
+      set rho_k item 1 res        
+      set denominator_T denominator_T + ( wC * rho_k ) 
+      set numerator_T numerator_T + wC * T_k * rho_k 
     ]    
+    ;print "T"
+    ;print Tfound
     ifelse Tfound > 0 ;; if at least one value has been calculated
     [ 
-      let T Ti + Tw + Tc ;; TODO: add weights
+      ifelse denominator_T != 0 
+      [ set T numerator_T / denominator_T ][set T 0]  ;; TODO: add weights
       set T-moy T-moy + T 
       set nb-T nb-T + 1
+      
+      ;print T
       if T >= T-max 
       [
         set T-max T
@@ -81,19 +106,19 @@ to-report choose [ nearest-providers-id ]
     [
       set has-no-trust-value-list lput p has-no-trust-value-list
     ]
-  ]
-  
+  ]  
   
   let proba 0
   ifelse nb-T > 0
   [
     set T-moy T-moy / nb-T
     set proba exp(T-max / Temp) / (exp(T-max / Temp) + exp(T-moy / Temp))
-    let choice random-float 1
-    ifelse proba < choice and not empty? has-no-trust-value-list        
+    let rand random-float 1
+    ifelse rand > proba and not empty? has-no-trust-value-list        
     [ ;print "exploration"
       report one-of has-no-trust-value-list ] ;;
     [ ;print "exploitation"
+      ;print id-max
       report id-max ]
   ]
   [report one-of has-no-trust-value-list ]
@@ -112,10 +137,10 @@ end
 
 to-report trust-certified [ p ]
   let list-of-review []
-  print p
+  ;print p
   ask turtle p [    
     set list-of-review rating-history
-    print rating-history
+    ;print rating-history
   ]
   report compute-Tk(list-of-review)
 end
@@ -157,18 +182,38 @@ end
 to-report compute-Tk [ list-of-rating ]
   ;;#########################
   ;;compute TK with the list L not empty and return TK
+  let w 0
+  let sum_w 0
   let Tk 0
   let denominator 0
+  let rating-reliability 0
+  let deviation-reliability 0
   ifelse empty? list-of-rating
-  [ report -2 ]
+  [ report (list -2 0) ]
   [
+    ;print "list"
+    ;print list-of-rating
     foreach list-of-rating
     [
       n -> 
-      set Tk (Tk + exp(-(ticks - item 2 n) / lambda) * (item 1 n))
-      set denominator (denominator + exp(-(ticks - item 2 n) / lambda))
+      set w exp(-(ticks - item 2 n) / lambda)
+      set Tk (Tk + w * (item 1 n))
+      set sum_w (sum_w + w)
     ]
-  report Tk / denominator
+    set Tk Tk / sum_w
+    ;print "rr"
+    set rating-reliability (1 - exp( - gamma * sum_w))
+    ;print rating-reliability
+    foreach list-of-rating
+    [
+      n -> 
+      set w exp(-(ticks - item 2 n) / lambda)
+      set deviation-reliability deviation-reliability + w * (abs( item 1 n - Tk)) 
+    ]
+    ;print "dr"
+    set deviation-reliability 1 - 0.5 * deviation-reliability / sum_w
+    ;print deviation-reliability
+    report (list Tk (rating-reliability * deviation-reliability))
   ]
   ;;#########################
 end
