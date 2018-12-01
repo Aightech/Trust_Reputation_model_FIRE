@@ -19,12 +19,6 @@ to random-position
 end
 
 to move
-  ;;set size radius-of-operation
-  ;;set shape "circle 2"
-  ;;stamp
-  ;;set size radius-of-operation + 10
-  ;;stamp-erase
-  
   if breed = consumers[
     if random-float 1 < p-cons-move [
       set phi phi + angle-max - random-float (2 * angle-max)
