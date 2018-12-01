@@ -54,6 +54,8 @@ to-report choose [ nearest-providers-id ]
   foreach nearest-providers-id
   [ p ->
     ;print " ----"
+    set denominator_T 0
+    set numerator_T 0
     if trust-interaction-model ;interaction
     [
       ;print "IT"
@@ -64,8 +66,8 @@ to-report choose [ nearest-providers-id ]
       ifelse T_k = -2 [set T_k 0][set Tfound Tfound + 1]
       set rho_k item 1 res   
       ;print rho_k     
-      set denominator_T denominator_T + ( wI * rho_k ) 
       set numerator_T numerator_T + wI * T_k * rho_k 
+      set denominator_T denominator_T + ( wI * rho_k ) 
     ]
     if trust-witness-model ;witness
     [
@@ -73,9 +75,9 @@ to-report choose [ nearest-providers-id ]
       set res trust-witness(p)
       set T_k item 0 res
       ifelse T_k = -2 [set T_k 0][set Tfound Tfound + 1]
-      set rho_k item 1 res        
-      set denominator_T denominator_T + ( wW * rho_k )  
-      set numerator_T numerator_T + wW * T_k * rho_k     
+      set rho_k item 1 res          
+      set numerator_T numerator_T + wW * T_k * rho_k  
+      set denominator_T denominator_T + ( wW * rho_k )   
     ]
     if trust-certified-model ;certified 
     [
@@ -83,9 +85,9 @@ to-report choose [ nearest-providers-id ]
       set res trust-certified(p)
       set T_k item 0 res
       ifelse T_k = -2 [set T_k 0][set Tfound Tfound + 1]
-      set rho_k item 1 res        
-      set denominator_T denominator_T + ( wC * rho_k ) 
+      set rho_k item 1 res         
       set numerator_T numerator_T + wC * T_k * rho_k 
+      set denominator_T denominator_T + ( wC * rho_k )
     ]    
     ;print "T"
     ;print Tfound
