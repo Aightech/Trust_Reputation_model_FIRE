@@ -6,6 +6,7 @@ turtles-own
   theta
   ;;;;--------------;;;;
   rating-history;;
+  rating-rules
   history-index
   acquaintances
 ]

@@ -5,6 +5,8 @@ globals [PL_PERFECT PL_GOOD PL_OK PL_WORST PL_BAD GOOD ORDINARY BAD INTERMITTENT
   gamma
   history-size
   data-list
+  sens-data
+  param-sens
 ]
 
 to set_constant
@@ -30,11 +32,12 @@ to set_constant
   
   set gamma (-1 * ln(0.5)) 
   set history-size 10
-  set data-list [["Ticks" "Temperature" "Mean UG" "Std Dev UG" ]]
+  set data-list [["Ticks" "Temperature" "Mean UG" "Std Dev UG" "Grp1" "Grp2"]]
+  set sens-data [["Ticks" "Temperature" "Mean UG" "Std Dev UG" "Grp1" "Grp2"]]
 end
 
 to save-data
-  set data-list lput (list ticks Temp mean-UG stand-dev-UG) data-list 
+  set data-list lput (list ticks Temp mean-UG stand-dev-UG mean-UG-grp1 mean-UG-grp2 mean-rhoT mean-rhoI mean-rhoW mean-rhoC) data-list 
   
 end
 

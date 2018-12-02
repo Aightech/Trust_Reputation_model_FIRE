@@ -1,10 +1,10 @@
 extensions [array]
 __includes["turtles.nls" "consumers.nls" "providers.nls" "constant.nls"]
 
-globals [number-providers Temp mean-UG mean-UG-interac-only mean-UG-witness-only mean-UG-certifi-only stand-dev-UG list-UG list-UG-interac-only list-UG-witness-only list-UG-certifi-only]
+globals [number-providers Temp mean-UG mean-UG-grp1 mean-UG-grp2 mean-rhoI mean-rhoW mean-rhoC mean-rhoT stand-dev-UG list-UG list-UG-grp1 list-UG-grp2 list-rhoI list-rhoW list-rhoC list-rhoT]
 
 to reset-settings-static
-  set number-consumers 500
+  set number-consumers-grp1 2
   set number-good-providers 10
   set number-ordinary-providers 40
   set number-bad-providers 45
@@ -21,41 +21,83 @@ to reset-settings-static
   set radius-of-operation 0.2
 end
 
+to settings-f9-0
+  set wI-grp1 1
+  set wW-grp1 0
+  set wC-grp1 0
+
+  set wI-grp2 0
+  set wW-grp2 0
+  set wC-grp2 0
+  setup
+end
+
+to settings-f9
+  set wI-grp1 1
+  set wW-grp1 0
+  set wC-grp1 0
+
+  set wI-grp2 1
+  set wW-grp2 1
+  set wC-grp2 0
+  setup
+end
+
+to settings-f10
+  set wI-grp1 1
+  set wW-grp1 0
+  set wC-grp1 0
+
+  set wI-grp2 1
+  set wW-grp2 0
+  set wC-grp2 1
+  setup
+end
+
+to settings-f11
+  set wI-grp1 1
+  set wW-grp1 1
+  set wC-grp1 0
+
+  set wI-grp2 1
+  set wW-grp2 1
+  set wC-grp2 1
+  setup
+end
+
 to setup
   clear-all
   zoom 62
   set Temp initial-Temp
   set mean-UG 0
-  set mean-UG-interac-only 0
-  set mean-UG-witness-only 0
-  set mean-UG-certifi-only 0
+  set mean-UG-grp1 0
+  set mean-UG-grp2 0
 
   set stand-dev-UG 0
   set list-UG []
-  set list-UG-interac-only []
-  set list-UG-witness-only []
-  set list-UG-certifi-only []
+  set list-UG-grp1 []
+  set list-UG-grp2 []
+  set list-rhoI []
+  set list-rhoW []
+  set list-rhoC []
+  set list-rhoT []
   set number-providers number-good-providers + number-ordinary-providers + number-intermittent-providers + number-bad-providers
   set_constant
-  create-consumers number-interaction-trust-only
+
+  create-consumers number-consumers-grp1
   [
     init-consumer
-    set wW 0
-    set wC 0
+    set wI wI-grp1
+    set wW wW-grp1
+    set wC wC-grp1
   ]
-  create-consumers number-witness-reputation-only
+  create-consumers number-consumers-grp2
   [
     init-consumer
-    set wI 0
-    set wC 0
+    set wI wI-grp2
+    set wW wW-grp2
+    set wC wC-grp2
   ]
-  create-consumers number-certified-reputation-only
-  [
-    init-consumer
-    set wW 0
-    set wI 0
-  ]
-  create-consumers number-consumers - count consumers [ init-consumer ]
 
   create-providers number-good-providers [
     init-provider GOOD
@@ -81,24 +123,27 @@ to start
       [stop]
 
   set mean-UG 0
-  set mean-UG-interac-only 0
-  set mean-UG-witness-only 0
-  set mean-UG-certifi-only 0
   set stand-dev-UG 0
   set list-UG []
-  set list-UG-interac-only []
-  set list-UG-witness-only []
-  set list-UG-certifi-only []
+  set list-UG-grp1 []
+  set list-UG-grp2 []
+  set list-rhoI []
+  set list-rhoW []
+  set list-rhoC []
+  set list-rhoT []
   ask consumers
   [
     process-consumer
   ]
   ;show list-UG
-  set mean-UG mean list-UG
-  if (empty? list-UG-interac-only = false)[ set mean-UG-interac-only mean list-UG-interac-only ]
-  if (empty? list-UG-witness-only = false)[ set mean-UG-witness-only mean list-UG-witness-only ]
-  if (empty? list-UG-certifi-only = false)[ set mean-UG-certifi-only mean list-UG-certifi-only ]
-  set stand-dev-UG  standard-deviation list-UG
+  if (empty? list-UG = false)[ set mean-UG mean list-UG ]
+  if (empty? list-UG-grp1 = false)[ set mean-UG-grp1 mean list-UG-grp1 ]
+  if (empty? list-UG-grp2 = false)[ set mean-UG-grp2 mean list-UG-grp2 ]
+  if (empty? list-rhoI = false)[ set mean-rhoI mean list-rhoI ]
+  if (empty? list-rhoW = false)[ set mean-rhoW mean list-rhoW ]
+  if (empty? list-rhoC = false)[ set mean-rhoC mean list-rhoC ]
+  if (empty? list-rhoT = false)[ set mean-rhoT mean list-rhoT ]
+  ;set stand-dev-UG  standard-deviation list-UG
   ask turtles
   [
     move;
@@ -109,7 +154,8 @@ to start
   [
     behaviour-update-provider
   ]
-  set Temp initial-temp - ticks * initial-temp / number-simulation
+  ;set Temp initial-temp - ticks * initial-temp / number-simulation
+  set Temp initial-temp * exp(- ticks / number-simulation)
 
   save-data
   display
@@ -121,34 +167,84 @@ to pop-update
   ;;kill a part of the population
   let r-cons random-float ratio-cons-update
   let r-prov random-float ratio-prov-update
-  ask n-of (r-cons * number-consumers) consumers[die]
+  ask n-of (r-cons * (number-consumers-grp1 + number-consumers-grp2)) consumers[die]
   ask n-of (r-prov * number-providers) providers[die]
   ;;add new agents
-  create-consumers number-interaction-trust-only - count consumers with [wW = 0 and wC = 0]
+  create-consumers number-consumers-grp1 - count consumers with [wI = wI-grp1 and wW = wW-grp1 and wC = wC-grp1]
   [
     init-consumer
-    set wW 0
-    set wC 0
+    set wI wI-grp1
+    set wW wW-grp1
+    set wC wC-grp1
   ]
-  create-consumers number-witness-reputation-only - count consumers with [wI = 0 and wC = 0]
+  create-consumers number-consumers-grp2 - count consumers with [wI = wI-grp2 and wW = wW-grp2 and wC = wC-grp2]
   [
     init-consumer
-    set wI 0
-    set wC 0
+    set wI wI-grp2
+    set wW wW-grp2
+    set wC wC-grp2
   ]
-  create-consumers number-certified-reputation-only - count consumers with [wW = 0 and wI = 0]
-  [
-    init-consumer
-    set wW 0
-    set wI 0
-  ]
-
-  create-consumers number-consumers - count consumers [ init-consumer ]
   ;ask n-of number-interaction-trust-only consumers with [wI != 0 and ]
   create-providers number-good-providers - count providers with [profile = GOOD] [ init-provider GOOD ]
   create-providers number-ordinary-providers - count providers with [profile = ORDINARY] [ init-provider ORDINARY ]
   create-providers number-bad-providers - count providers with [profile = BAD] [ init-provider BAD ]
   create-providers number-intermittent-providers - count providers with [profile = INTERMITTENT] [ init-provider INTERMITTENT ]
+end
+
+to sensibility
+  ifelse ticks <= number-simulation
+  [
+
+    set mean-UG 0
+    set stand-dev-UG 0
+    set list-UG []
+    set list-UG-grp1 []
+    set list-UG-grp2 []
+    set list-rhoI []
+    set list-rhoW []
+    set list-rhoC []
+    set list-rhoT []
+    ask consumers
+    [
+      process-consumer
+    ]
+    ;show list-UG
+    if (empty? list-UG = false)[ set mean-UG mean list-UG ]
+    if (empty? list-UG-grp1 = false)[ set mean-UG-grp1 mean list-UG-grp1 ]
+    if (empty? list-UG-grp2 = false)[ set mean-UG-grp2 mean list-UG-grp2 ]
+    if (empty? list-rhoI = false)[ set mean-rhoI mean list-rhoI ]
+    if (empty? list-rhoW = false)[ set mean-rhoW mean list-rhoW ]
+    if (empty? list-rhoC = false)[ set mean-rhoC mean list-rhoC ]
+    if (empty? list-rhoT = false)[ set mean-rhoT mean list-rhoT ]
+    ;set stand-dev-UG  standard-deviation list-UG
+    ask turtles
+    [
+      move;
+      set-acquaintances
+    ]
+    pop-update
+    ask providers
+    [
+      behaviour-update-provider
+    ]
+    ;set Temp initial-temp - ticks * initial-temp / number-simulation
+    set Temp initial-temp * exp(- ticks / number-simulation)
+
+    save-data
+    display
+    ;;clear-drawing
+    tick
+    print ticks
+  ]
+  [
+    set sens-data lput (list ticks Temp mean-UG stand-dev-UG mean-UG-grp1 mean-UG-grp2 mean-rhoT mean-rhoI mean-rhoW mean-rhoC) data-list
+    if initial-temp > last-value-sens [stop]
+    set initial-temp initial-temp + step-sens
+    print initial-temp
+    setup
+    reset-ticks
+  ]
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -198,10 +294,10 @@ NIL
 1
 
 PLOT
-207
-707
-407
-857
+216
+751
+416
+901
 xcor
 NIL
 NIL
@@ -216,10 +312,10 @@ PENS
 "xcor" 1.0 1 -16777216 true "" "histogram [xcor * 10] of turtles"
 
 PLOT
-420
-711
-620
-861
+429
+755
+629
+905
 ycor
 NIL
 NIL
@@ -234,10 +330,10 @@ PENS
 "ycor" 1.0 1 -16777216 true "" "histogram [ycor * 10] of turtles"
 
 PLOT
-632
-708
-832
-858
+641
+752
+841
+902
 zcor
 NIL
 NIL
@@ -252,15 +348,15 @@ PENS
 "zcor" 1.0 1 -16777216 true "" "histogram [zcor * 10] of turtles"
 
 SLIDER
-11
-97
-270
-130
-number-consumers
-number-consumers
+204
+258
+419
+291
+number-consumers-grp1
+number-consumers-grp1
 0
 500
-200.0
+500.0
 1
 1
 NIL
@@ -284,10 +380,10 @@ NIL
 0
 
 SLIDER
-13
-627
-148
-660
+22
+671
+157
+704
 p-cons-move
 p-cons-move
 0
@@ -299,10 +395,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-14
-663
-149
-696
+23
+707
+158
+740
 p-prov-move
 p-prov-move
 0
@@ -314,10 +410,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-14
-699
-150
-732
+23
+743
+159
+776
 angle-max
 angle-max
 0
@@ -329,10 +425,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-13
-548
-187
-581
+22
+592
+196
+625
 ratio-prov-update
 ratio-prov-update
 0
@@ -344,10 +440,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-12
-585
-185
-618
+21
+629
+194
+662
 ratio-cons-update
 ratio-cons-update
 0
@@ -367,7 +463,7 @@ number-simulation
 number-simulation
 0
 1000
-500.0
+100.0
 1
 1
 rounds
@@ -484,16 +580,16 @@ radius-of-operation
 0
 1
 0.2
-0.1
+0.01
 1
 NIL
 HORIZONTAL
 
 SLIDER
-14
-744
-186
-777
+23
+788
+195
+821
 M
 M
 0
@@ -505,10 +601,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-13
-788
-185
-821
+22
+832
+194
+865
 p-muC
 p-muC
 0
@@ -520,10 +616,10 @@ NIL
 HORIZONTAL
 
 SLIDER
-12
-828
-184
-861
+21
+872
+193
+905
 p-profile-switch
 p-profile-switch
 0
@@ -546,10 +642,10 @@ drawing-r0
 -1000
 
 SWITCH
-85
-242
-253
-275
+23
+230
+191
+263
 trust-interaction-model
 trust-interaction-model
 0
@@ -557,10 +653,10 @@ trust-interaction-model
 -1000
 
 SWITCH
-338
-244
-507
-277
+23
+268
+192
+301
 trust-witness-model
 trust-witness-model
 1
@@ -568,26 +664,26 @@ trust-witness-model
 -1000
 
 SWITCH
-593
-244
-763
-277
+23
+305
+193
+338
 trust-certified-model
 trust-certified-model
-1
+0
 1
 -1000
 
 SLIDER
-17
-330
-181
-363
+26
+374
+190
+407
 initial-temp
 initial-temp
 0
 10
-3.5
+10.0
 0.1
 1
 NIL
@@ -611,31 +707,30 @@ NIL
 0
 
 PLOT
-202
-336
-435
-505
+847
+76
+1757
+475
 mean-UG
 round
 mean-UG
 0.0
-200.0
+201.0
 -1.0
 0.0
 true
-false
+true
 "" ""
 PENS
-"default" 1.0 0 -10899396 true "" "plot mean-UG"
-"pen-1" 1.0 0 -7500403 true "" "plot mean-UG-interac-only"
-"pen-2" 1.0 0 -2674135 true "" "plot mean-UG-witness-only"
-"pen-3" 1.0 0 -955883 true "" "plot mean-UG-certifi-only"
+"mean" 1.0 0 -10899396 true "" "plot mean-UG"
+"grp1" 1.0 0 -7500403 true "" "plot mean-UG-grp1"
+"grp2" 1.0 0 -2674135 true "" "plot mean-UG-grp2"
 
 PLOT
-202
-513
-470
-686
+211
+557
+479
+730
 Profile of providers
 NIL
 NIL
@@ -653,10 +748,10 @@ PENS
 "ORDINARY" 1.0 0 -2674135 true "" "plot count providers with [profile = ORDINARY]"
 
 PLOT
-11
-378
-179
-498
+20
+422
+188
+542
 Evolution temperature
 NIL
 NIL
@@ -673,7 +768,7 @@ PENS
 BUTTON
 14
 10
-802
+196
 43
 reset settings
 reset-settings-static\n\n
@@ -688,10 +783,10 @@ NIL
 1
 
 PLOT
-438
-337
-620
-502
+211
+381
+477
+546
 standart deviation UG
 NIL
 NIL
@@ -706,10 +801,10 @@ PENS
 "default" 1.0 0 -13345367 true "" "plot stand-dev-UG"
 
 PLOT
-480
-513
-824
-684
+489
+557
+833
+728
 Mean performance of providers
 mean performance level
 number of providers
@@ -724,10 +819,10 @@ PENS
 "default" 1.0 0 -2674135 true "" "histogram [mu-perf] of providers"
 
 PLOT
-631
-337
-821
-499
+490
+381
+830
+543
 UG gain by each consumer
 UG gain
 number of consumers
@@ -742,20 +837,20 @@ PENS
 "default" 1.0 0 -16777216 true "" "histogram list-UG"
 
 TEXTBOX
-14
-521
-205
-549
+23
+565
+214
+593
 Settings for a dynamic environment:
 11
 0.0
 1
 
 BUTTON
-831
-235
-975
-277
+825
+10
+1768
+52
 export measures
 export-measures
 NIL
@@ -769,29 +864,59 @@ NIL
 1
 
 SLIDER
-37
-287
-288
-320
-number-interaction-trust-only
-number-interaction-trust-only
+431
+259
+534
+292
+wI-grp1
+wI-grp1
 0
-number-consumers
-200.0
+5
+1.0
 1
 1
 NIL
 HORIZONTAL
 
 SLIDER
-299
-284
-548
-317
-number-witness-reputation-only
-number-witness-reputation-only
+539
+260
+642
+293
+wW-grp1
+wW-grp1
 0
-number-consumers
+5
+1.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+647
+260
+750
+293
+wC-grp1
+wC-grp1
+0
+5
+1.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+203
+323
+420
+356
+number-consumers-grp2
+number-consumers-grp2
+0
+500
 0.0
 1
 1
@@ -799,19 +924,231 @@ NIL
 HORIZONTAL
 
 SLIDER
-562
-285
-809
-318
-number-certified-reputation-only
-number-certified-reputation-only
+429
+323
+536
+356
+wI-grp2
+wI-grp2
 0
-number-consumers
+5
 0.0
 1
 1
 NIL
 HORIZONTAL
+
+SLIDER
+540
+323
+644
+356
+wW-grp2
+wW-grp2
+0
+5
+0.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+649
+323
+754
+356
+wC-grp2
+wC-grp2
+0
+5
+0.0
+1
+1
+NIL
+HORIZONTAL
+
+TEXTBOX
+216
+235
+366
+253
+GRP 1 parameters
+12
+0.0
+1
+
+TEXTBOX
+212
+305
+362
+323
+GRP 2 parameters
+12
+0.0
+1
+
+BUTTON
+208
+11
+354
+44
+settings IT perf (fig9)
+settings-f9-0
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+358
+11
+509
+44
+settings WR perf (fig9)
+settings-f9
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+515
+11
+672
+44
+settings CR perf (fig10)
+settings-f10
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+BUTTON
+676
+11
+814
+44
+settings perf2 CR
+settings-f11
+NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+856
+502
+1757
+819
+mean-rho
+round
+NIL
+0.0
+201.0
+0.0
+1.0
+true
+true
+"" ""
+PENS
+"rho Total" 1.0 0 -16777216 true "" "plot mean-rhoT"
+"rho IT" 1.0 0 -7500403 true "" "plot mean-rhoI"
+"rho WR" 1.0 0 -2674135 true "" "plot mean-rhoW"
+"rho CR" 1.0 0 -955883 true "" "plot mean-rhoC"
+
+BUTTON
+862
+841
+1149
+874
+sensibility
+sensibility
+T
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+1267
+849
+1444
+882
+initial-value-sens
+initial-value-sens
+0
+100
+0.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1447
+850
+1619
+883
+last-value-sens
+last-value-sens
+0
+100
+13.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+1621
+850
+1793
+883
+step-sens
+step-sens
+0
+100
+2.0
+1
+1
+NIL
+HORIZONTAL
+
+SWITCH
+23
+340
+195
+373
+trust-role-model
+trust-role-model
+1
+1
+-1000
 
 @#$#@#$#@
 ## WHAT IS IT?
