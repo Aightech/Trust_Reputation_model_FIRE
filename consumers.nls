@@ -16,9 +16,7 @@ to init-consumer
   set rating-history n-values history-size [[0 0 0]]
   set history-index 0
   random-position
-  set wI 2
-  set wW 2
-  set wC 2
+  set rating-rules [[0 0.3 0.7] [1 0.1 0.3] [2 -0.3 0.7] [3 0 0.1]]
 end
 
 to  process-consumer
@@ -40,8 +38,8 @@ to  process-consumer
       set list-UG lput utility list-UG
       
     ]
-    if wI = wI-grp1 and wW = wW-grp1 and wC = wC-grp1 [ set list-UG-grp1 lput utility list-UG-grp1 ]
-    if wI = wI-grp2 and wW = wW-grp2 and wC = wC-grp2 [ set list-UG-grp2 lput utility list-UG-grp2 ]
+    if wI = wI-grp1 and wW = wW-grp1 and wC = wC-grp1 and wR = wR-grp1 [ set list-UG-grp1 lput utility list-UG-grp1 ]
+    if wI = wI-grp2 and wW = wW-grp2 and wC = wC-grp2 and wR = wR-grp2 [ set list-UG-grp2 lput utility list-UG-grp2 ]
     store-rating-consumer p utility ticks
   ]
 end
@@ -185,7 +183,6 @@ to-report trust-role [ p ]
   [ report (list -2 0) ]
   [
     ;print "list"
-    ;print list-of-rating
     foreach list-of-rule
     [
       n -> 
@@ -200,7 +197,7 @@ to-report trust-role [ p ]
     foreach list-of-rule
     [
       n -> 
-      set w exp(-(ticks - item 2 n) / lambda)
+      set w (item 2 n)
       set deviation-reliability deviation-reliability + w * (abs( item 1 n - Tr)) 
     ]
     ;print "dr"
